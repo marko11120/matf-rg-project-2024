@@ -9,6 +9,10 @@
 class MainController : public engine::core::Controller {
     bool loop() override;
     void initialize() override;
+    void begin_draw() override;
+    void draw() override;
+    void draw_skybox();
+    void end_draw() override;
 };
 
 #endif //MAINCONTROLLER_H

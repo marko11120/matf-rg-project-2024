@@ -1,3 +1,5 @@
+#include <engine/platform/PlatformController.hpp>
+
 #include "../include/MyApp.h"
 
 #include "../../engine/libs/spdlog/include/spdlog/spdlog.h"
