@@ -12,7 +12,9 @@ class MainController : public engine::core::Controller {
     void begin_draw() override;
     void draw() override;
     void draw_skybox();
+    void draw_moon();
     void end_draw() override;
 };
+
 
 #endif //MAINCONTROLLER_H

@@ -1,6 +1,9 @@
 {
   "resources": {
     "models": {
+      "Moon" : {
+        "path" : "Moon/Moon.obj"
+      }
     }
   },
   "window": {
