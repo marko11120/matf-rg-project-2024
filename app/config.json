@@ -3,12 +3,15 @@
     "models": {
       "Moon" : {
         "path" : "Moon/Moon.obj"
+      },
+      "space_station": {
+       "path" : "space_station/space_station.obj"
       }
     }
   },
   "window": {
-    "height": 1080,
-    "title": "mi23307's application",
-    "width": 1980
+    "height": 680,
+    "title": "Space station",
+    "width": 880
   }
 }

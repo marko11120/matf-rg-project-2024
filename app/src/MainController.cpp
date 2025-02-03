@@ -11,9 +11,14 @@
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
     void on_mouse_move(engine::platform::MousePosition position) override;
+    bool first_flick = true;
 };
 
 void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
+    if(first_flick) {
+        first_flick = false;
+        return;
+    }
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
 
@@ -67,9 +72,25 @@ void MainController::draw_moon() {
     model->draw(shader);
 }
 
+void MainController::draw_space_station() {
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    engine::resources::Model *model   = resources->model("space_station");
+    engine::resources::Shader *shader = resources->shader("space_station");
+
+    shader->use();
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    glm::mat4 model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, -7.f, -20.0f));
+    model_matrix = glm::scale(model_matrix, glm::vec3(0.05f));
+    shader->set_mat4("model", model_matrix);
+    model->draw(shader);
+}
 void MainController::draw() {
-    draw_skybox();
     draw_moon();
+    draw_space_station();
+    draw_skybox();
 }
 
 void MainController::end_draw() {
