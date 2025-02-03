@@ -113,6 +113,8 @@ namespace engine::graphics {
          */
         void zoom(float offset);
 
+        void set_cursor_visible(bool flag);
+
     private:
         /**
          * @brief Calculates the front vector from the Camera's (updated) Euler Angles
