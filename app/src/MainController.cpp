@@ -65,7 +65,7 @@ void MainController::draw_moon() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
     float timeValue = 10 * glfwGetTime();
-    model_matrix = glm::translate(model_matrix, glm::vec3(15.f, 30.f, -90.f));
+    model_matrix = glm::translate(model_matrix, glm::vec3(15.f, 30.f, -55.f));
     model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.0f, 1.0f, 0.0f));
     model_matrix = glm::scale(model_matrix, glm::vec3(0.6f));
     shader->set_mat4("model", model_matrix);
@@ -79,6 +79,16 @@ void MainController::draw_space_station() {
     engine::resources::Shader *shader = resources->shader("space_station");
 
     shader->use();
+    shader->set_vec3("light.ambient", glm::vec3(0.8f));
+    shader->set_vec3("light.diffuse", glm::vec3(1.0f));
+    shader->set_vec3("light.specular", glm::vec3(1.0f));
+    shader->set_vec3("light.position", glm::vec3(15.f, 30.f, -55.f));
+
+    shader->set_float("material.linearC", 0.003f);
+    shader->set_float("material.quadraticC", 0.0001f);
+    shader->set_float("material.shininess", 32.f);
+    shader->set_vec3("cameraPos", graphics->camera()->Position);
+
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
@@ -95,6 +105,16 @@ void MainController::draw_space_craft() {
     engine::resources::Shader *shader = resources->shader("space_craft");
 
     shader->use();
+    shader->set_vec3("light.ambient", glm::vec3(0.8f));
+    shader->set_vec3("light.diffuse", glm::vec3(1.0f));
+    shader->set_vec3("light.specular", glm::vec3(1.0f));
+    shader->set_vec3("light.position", glm::vec3(15.f, 30.f, -55.f));
+
+    shader->set_float("material.linearC", 0.003f);
+    shader->set_float("material.quadraticC", 0.0001f);
+    shader->set_float("material.shininess", 32.f);
+    shader->set_vec3("cameraPos", graphics->camera()->Position);
+
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
