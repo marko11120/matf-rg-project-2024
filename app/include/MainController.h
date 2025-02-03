@@ -14,6 +14,7 @@ class MainController : public engine::core::Controller {
     void draw_skybox();
     void draw_moon();
     void draw_space_station();
+    void draw_space_craft();
     void end_draw() override;
     void update() override;
     void update_camera();

@@ -65,9 +65,9 @@ void MainController::draw_moon() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
     float timeValue = 10 * glfwGetTime();
-    model_matrix = glm::translate(model_matrix, glm::vec3(5.f, 4.f, -30.f));
+    model_matrix = glm::translate(model_matrix, glm::vec3(15.f, 30.f, -90.f));
     model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.0f, 1.0f, 0.0f));
-    model_matrix = glm::scale(model_matrix, glm::vec3(0.3f));
+    model_matrix = glm::scale(model_matrix, glm::vec3(0.6f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);
 }
@@ -82,14 +82,34 @@ void MainController::draw_space_station() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, -7.f, -20.0f));
-    model_matrix = glm::scale(model_matrix, glm::vec3(0.05f));
+    model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, -7.f, -40.0f));
+    model_matrix = glm::scale(model_matrix, glm::vec3(0.08f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);
 }
+
+void MainController::draw_space_craft() {
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    engine::resources::Model *model   = resources->model("spacecraft2");
+    engine::resources::Shader *shader = resources->shader("space_craft");
+
+    shader->use();
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    glm::mat4 model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, -2.0f, -40.0f));
+    model_matrix = glm::scale(model_matrix, glm::vec3(0.4f));
+    shader->set_mat4("model", model_matrix);
+    model->draw(shader);
+}
+
+
+
 void MainController::draw() {
     draw_moon();
     draw_space_station();
+    draw_space_craft();
     draw_skybox();
 }
 
