@@ -2,7 +2,7 @@
 [x] - add camera movement
 [x] - add pointing light
 
-[] - add gui
+[x] - add gui
 [] - add flashlight in camera
 
 [] - add pointing shadows

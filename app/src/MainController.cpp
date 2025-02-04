@@ -7,11 +7,18 @@
 #include <engine/platform/PlatformController.hpp>
 #include <engine/resources/ResourcesController.hpp>
 #include "../include/MainController.h"
+
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <iostream>
+
+#include "glm/gtc/type_ptr.hpp"
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
     void on_mouse_move(engine::platform::MousePosition position) override;
+    void on_key(engine::platform::Key key) override;
     bool first_flick = true;
+    bool cursor_visibility = false;
 };
 
 void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
@@ -21,10 +28,29 @@ void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition po
     }
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
+    if(camera->get_cursor_status())
+        return;
 
     camera->rotate_camera(position.dx, position.dy);
 }
 
+void MainPlatformEventObserver::on_key(engine::platform::Key key) {
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto camera = graphics->camera();
+
+    if(platform->key(engine::platform::KeyId::KEY_F12).is_down()) {
+        if(!cursor_visibility) {
+            cursor_visibility = true;
+            camera->set_cursor_status(cursor_visibility);
+            camera->set_cursor_visible(cursor_visibility);
+        }else {
+            cursor_visibility = false;
+            camera->set_cursor_status(cursor_visibility);
+            camera->set_cursor_visible(cursor_visibility);
+        }
+    }
+}
 
 void MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
@@ -33,6 +59,7 @@ void MainController::initialize() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
     camera->set_cursor_visible(false);
+    camera->set_cursor_status(false);
 }
 
 bool MainController::loop() {
@@ -79,9 +106,9 @@ void MainController::draw_space_station() {
     engine::resources::Shader *shader = resources->shader("space_station");
 
     shader->use();
-    shader->set_vec3("light.ambient", glm::vec3(0.8f));
-    shader->set_vec3("light.diffuse", glm::vec3(1.0f));
-    shader->set_vec3("light.specular", glm::vec3(1.0f));
+    shader->set_vec3("light.ambient", this->light.ambient);
+    shader->set_vec3("light.diffuse", this->light.diffuse);
+    shader->set_vec3("light.specular", this->light.specular);
     shader->set_vec3("light.position", glm::vec3(15.f, 30.f, -55.f));
 
     shader->set_float("material.linearC", 0.003f);
@@ -105,9 +132,9 @@ void MainController::draw_space_craft() {
     engine::resources::Shader *shader = resources->shader("space_craft");
 
     shader->use();
-    shader->set_vec3("light.ambient", glm::vec3(0.8f));
-    shader->set_vec3("light.diffuse", glm::vec3(1.0f));
-    shader->set_vec3("light.specular", glm::vec3(1.0f));
+    shader->set_vec3("light.ambient", this->light.ambient);
+    shader->set_vec3("light.diffuse", this->light.diffuse);
+    shader->set_vec3("light.specular", this->light.specular);
     shader->set_vec3("light.position", glm::vec3(15.f, 30.f, -55.f));
 
     shader->set_float("material.linearC", 0.003f);
@@ -124,6 +151,35 @@ void MainController::draw_space_craft() {
     model->draw(shader);
 }
 
+void MainController::draw_gui() {
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto camera   = graphics->camera();
+    graphics->begin_gui();
+    // Draw Camera Info window
+    {
+        ImGui::Begin("Camera info");
+        ImGui::SetNextWindowPos(ImVec2(500, 350));
+        ImGui::SetNextWindowSize(ImVec2(710, 300));
+        const auto &c = *camera;
+        ImGui::Text("Camera position: (%f, %f, %f)", c.Position.x, c.Position.y, c.Position.z);
+        ImGui::Text("(Yaw, Pitch): (%f, %f)", c.Yaw, c.Pitch);
+        ImGui::Text("Camera front: (%f, %f, %f)", c.Front.x, c.Front.y, c.Front.z);
+        ImGui::SliderFloat("Camera x", &camera->Position.x, 0.1f, 10.0f, "%.2f");
+        ImGui::SliderFloat("Camera y", &camera->Position.y, 0.1f, 10.0f, "%.2f");
+        ImGui::SliderFloat("Camera z", &camera->Position.z, 0.1f, 10.0f, "%.2f");
+
+
+        ImGui::Text("Ambient light intensity: (%f, %f, %f)", this->light.ambient.x, this->light.ambient.y, this->light.ambient.z);
+        ImGui::SliderFloat3("Ambient slider", glm::value_ptr(this->light.ambient), 0.1f, 1.f);
+        ImGui::Text("Diffuse light intensity: (%f, %f, %f)", this->light.diffuse.x, this->light.diffuse.y, this->light.diffuse.z);
+        ImGui::SliderFloat3("Diffuse slider", glm::value_ptr(this->light.diffuse), 0.1f, 1.f);
+        ImGui::Text("Specular light intensity: (%f, %f, %f)", this->light.specular.x, this->light.specular.y, this->light.specular.z);
+        ImGui::SliderFloat3("Specular slider", glm::value_ptr(this->light.specular), 0.1f, 1.f);
+        ImGui::End();
+    }
+    graphics->end_gui();
+}
+
 
 
 void MainController::draw() {
@@ -131,6 +187,12 @@ void MainController::draw() {
     draw_space_station();
     draw_space_craft();
     draw_skybox();
+    auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto camera   = graphics->camera();
+    if (camera->get_cursor_status()) {
+        draw_gui();
+    }
+
 }
 
 void MainController::end_draw() {
@@ -147,8 +209,10 @@ void MainController::update_camera() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
-    float delta = platform->dt();
+    if(camera->get_cursor_status())
+        return;
 
+    float delta = platform->dt();
     if(platform->key(engine::platform::KeyId::KEY_W).is_down()) {
         camera->move_camera(engine::graphics::Camera::FORWARD, delta);
     }
@@ -162,4 +226,5 @@ void MainController::update_camera() {
         camera->move_camera(engine::graphics::Camera::RIGHT, delta);
     }
 }
+
 

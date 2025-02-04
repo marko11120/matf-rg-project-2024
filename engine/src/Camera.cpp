@@ -102,4 +102,12 @@ namespace engine::graphics {
         }
     }
 
+    bool Camera::get_cursor_status() {
+        return cursor_visible;
+    }
+
+    void Camera::set_cursor_status(bool status) {
+        cursor_visible = status;
+    }
+
 }

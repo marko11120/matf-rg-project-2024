@@ -114,12 +114,14 @@ namespace engine::graphics {
         void zoom(float offset);
 
         void set_cursor_visible(bool flag);
-
+        bool get_cursor_status();
+        void set_cursor_status(bool status);
     private:
         /**
          * @brief Calculates the front vector from the Camera's (updated) Euler Angles
          */
         void update_camera_vectors();
+        bool cursor_visible;
     };
 }
 #endif
