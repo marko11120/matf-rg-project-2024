@@ -1,11 +1,11 @@
-# {NAME-OF-THE-PROJECT}
+# {Space station}
 
-{INDEX} - {STUDENT-FULL-NAME}  
-{PROJECT DESCRIPTION}
+{307/2023} - {Marko Perisic}  
+{Space station with space ship and little synthetic moon as its light source}
 
 ## Controls
 
-{BUTTON1} -> {ACTION1}  
+{ESC} -> {application terminate}  
 {BUTTON2} -> {ACTION2}  
 ...  
 {BUTTONN} -> {ACTIONN}
@@ -14,7 +14,7 @@
 
 ### Fundamental:
 
-[ ] Model with lighting
+[x] Model with lighting
 [ ] Two types of lighting with customizable colors and movement through GUI or ACTIONS
 [ ] {ACTION_X} --- AFTER_M_SECONDS---Triggers---> {EVENT_A} ---> AFTER_N_SECONDS---Triggers---> {EVENT_B}
 
