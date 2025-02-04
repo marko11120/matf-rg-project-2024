@@ -111,10 +111,15 @@ void MainController::draw_space_station() {
     shader->set_vec3("light.specular", this->light.specular);
     shader->set_vec3("light.position", glm::vec3(15.f, 30.f, -55.f));
 
+    shader->set_vec3("light.direction", graphics->camera()->Front);
+    shader->set_float("light.cut_off", cos(glm::radians(12.5f)));
+    shader->set_float("light.outerCut_off", cos(glm::radians(17.5f)));
+
     shader->set_float("material.linearC", 0.003f);
     shader->set_float("material.quadraticC", 0.0001f);
     shader->set_float("material.shininess", 32.f);
     shader->set_vec3("cameraPos", graphics->camera()->Position);
+
 
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
@@ -136,6 +141,7 @@ void MainController::draw_space_craft() {
     shader->set_vec3("light.diffuse", this->light.diffuse);
     shader->set_vec3("light.specular", this->light.specular);
     shader->set_vec3("light.position", glm::vec3(15.f, 30.f, -55.f));
+
 
     shader->set_float("material.linearC", 0.003f);
     shader->set_float("material.quadraticC", 0.0001f);

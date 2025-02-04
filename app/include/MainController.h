@@ -13,6 +13,14 @@ struct Light{
     glm::vec3 specular = glm::vec3(1.0f);
 };
 
+struct spotLight {
+    glm::vec3 ambient = glm::vec3(0.8f);
+    glm::vec3 diffuse = glm::vec3(1.0f);
+    glm::vec3 specular = glm::vec3(1.0f);
+    float cut_off;
+    float outterCut_off;
+};
+
 class MainController : public engine::core::Controller {
 public:
     bool loop() override;
@@ -28,6 +36,8 @@ public:
     void update() override;
     void update_camera();
     Light light;
+    Light spotLight;
+
 };
 
 #endif //MAINCONTROLLER_H
