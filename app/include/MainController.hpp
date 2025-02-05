@@ -1,9 +1,13 @@
 //
-// Created by marko on 2/2/25.
+// Created by marko on 2/5/25.
 //
 
-#ifndef MAINCONTROLLER_H
-#define MAINCONTROLLER_H
+#ifndef MAINCONTROLLER_HPP
+#define MAINCONTROLLER_HPP
+#include <engine/graphics/GraphicsController.hpp>
+#include <engine/graphics/OpenGL.hpp>
+#include <engine/platform/PlatformController.hpp>
+#include <engine/resources/ResourcesController.hpp>
 #include <engine/core/Controller.hpp>
 #include <glm/glm.hpp>
 
@@ -40,4 +44,7 @@ public:
 
 };
 
-#endif //MAINCONTROLLER_H
+
+#endif //MAINCONTROLLER_HPP
+
+

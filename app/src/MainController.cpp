@@ -2,33 +2,27 @@
 // Created by marko on 2/2/25.
 //
 
-#include <engine/graphics/GraphicsController.hpp>
-#include <engine/graphics/OpenGL.hpp>
-#include <engine/platform/PlatformController.hpp>
-#include <engine/resources/ResourcesController.hpp>
-#include "../include/MainController.h"
 
-#include <GLFW/glfw3.h>
+#include "MainController.hpp"
 #include <imgui.h>
-#include <iostream>
-
-#include "glm/gtc/type_ptr.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
     void on_mouse_move(engine::platform::MousePosition position) override;
     void on_key(engine::platform::Key key) override;
-    bool first_flick = true;
+    bool m_first_flick = true;
     bool cursor_visibility = false;
 };
 
 void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition position) {
-    if(first_flick) {
-        first_flick = false;
+    if(m_first_flick) {
+        m_first_flick = false;
         return;
     }
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
-    if(camera->get_cursor_status())
+    if(platform->get_cursor_status())
         return;
 
     camera->rotate_camera(position.dx, position.dy);
@@ -39,18 +33,14 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
 
+
     if(platform->key(engine::platform::KeyId::KEY_F12).is_down()) {
-        if(!cursor_visibility) {
-            cursor_visibility = true;
-            camera->set_cursor_status(cursor_visibility);
-            camera->set_cursor_visible(cursor_visibility);
-        }else {
-            cursor_visibility = false;
-            camera->set_cursor_status(cursor_visibility);
-            camera->set_cursor_visible(cursor_visibility);
-        }
+            cursor_visibility = !cursor_visibility;
+            platform->set_cursor_status(cursor_visibility);
+            platform->set_cursor_visible(cursor_visibility);
     }
 }
+
 
 void MainController::initialize() {
     engine::graphics::OpenGL::enable_depth_testing();
@@ -58,8 +48,9 @@ void MainController::initialize() {
     engine::core::Controller::get<engine::platform::PlatformController>()->register_platform_event_observer(std::move(observer));
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
-    camera->set_cursor_visible(false);
-    camera->set_cursor_status(false);
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+    platform->set_cursor_visible(false);
+    platform->set_cursor_status(false);
 }
 
 bool MainController::loop() {
@@ -86,12 +77,12 @@ void MainController::draw_moon() {
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     engine::resources::Model *model   = resources->model("Moon");
     engine::resources::Shader *shader = resources->shader("moon");
-
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     shader->use();
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    float timeValue = 10 * glfwGetTime();
+    float timeValue = 10 * platform->frame_time().current;
     model_matrix = glm::translate(model_matrix, glm::vec3(15.f, 30.f, -55.f));
     model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.0f, 1.0f, 0.0f));
     model_matrix = glm::scale(model_matrix, glm::vec3(0.6f));
@@ -194,8 +185,9 @@ void MainController::draw() {
     draw_space_craft();
     draw_skybox();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto camera   = graphics->camera();
-    if (camera->get_cursor_status()) {
+    if (platform->get_cursor_status()) {
         draw_gui();
     }
 
@@ -215,7 +207,7 @@ void MainController::update_camera() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
     auto camera = graphics->camera();
-    if(camera->get_cursor_status())
+    if(platform->get_cursor_status())
         return;
 
     float delta = platform->dt();

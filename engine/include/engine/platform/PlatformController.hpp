@@ -130,6 +130,9 @@ namespace engine::platform {
 
         void _platform_on_mouse_button(int button, int action);
 
+        void set_cursor_visible(bool flag);
+        bool get_cursor_status();
+        void set_cursor_status(bool status);
     private:
         Key &key_ref(KeyId key);
 
@@ -151,6 +154,7 @@ namespace engine::platform {
 
         void update_key(Key &key_data) const;
 
+        bool m_cursor_visible = false;
         FrameTime m_frame_time;
         Window m_window;
         std::vector<Key> m_keys;

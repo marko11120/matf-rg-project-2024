@@ -1,7 +1,7 @@
 # {Space station}
 
 {307/2023} - {Marko Perisic}  
-{Space station with space ship and little synthetic moon as its light source}
+{Space station with spacecraft and little synthetic moon as its light source}
 
 ## Controls
 

@@ -91,23 +91,4 @@ namespace engine::graphics {
         Up = glm::normalize(glm::cross(Right, Front));
     }
 
-    void Camera::set_cursor_visible(bool flag) {
-        auto platform = engine::core::Controller::get<platform::PlatformController>();
-        auto window = platform->window()->handle_();
-
-        if(flag)
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        else {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        }
-    }
-
-    bool Camera::get_cursor_status() {
-        return cursor_visible;
-    }
-
-    void Camera::set_cursor_status(bool status) {
-        cursor_visible = status;
-    }
-
 }
