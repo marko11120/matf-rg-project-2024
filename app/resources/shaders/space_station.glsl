@@ -5,8 +5,8 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
 out vec3 FragPos;
-out vec2 TexCoords;
 out vec3 Normal;
+out vec2 TexCoords;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -25,15 +25,20 @@ void main(){
 out vec4 FragColor;
 
 in vec3 FragPos;
-in vec2 TexCoords;
 in vec3 Normal;
+in vec2 TexCoords;
 
 struct Light{
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
     vec3 position;
+};
 
+struct SpotLight{
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
     vec3 direction;
     float cut_off;
     float outerCut_off;
@@ -49,13 +54,12 @@ struct Material{
 };
 
 uniform Light light;
+uniform SpotLight spotLight;
 uniform Material material;
 uniform vec3 cameraPos;
 
 void main(){
     //POINT
-    if(FragPos.x < 0.1f && FragPos.y < 0.1 && FragPos.z < 0.1f)
-            FragColor = vec4(1.f, 0.f, 0.f, 1.f);
     float distance = length(FragPos - light.position);
     float attenuation = 1.0/(1.0 + material.linearC * distance + material.quadraticC * pow(distance, 2));
 
@@ -76,37 +80,35 @@ void main(){
 
     //SPOT
     lightDir = normalize(FragPos - cameraPos);
-    float theta = dot(lightDir, normalize(light.direction));
+    float theta = dot(lightDir, normalize(spotLight.direction));
 
     //ambient
     ambient += 0.5 * light.ambient * texture(material.texture_diffuse, TexCoords).rgb;
     //diffuse
     diff = max(dot(-lightDir, normalize(Normal)), 0.0);
-    diffuse += light.diffuse * texture(material.texture_diffuse, TexCoords).rgb * diff;
+    diffuse += spotLight.diffuse * texture(material.texture_diffuse, TexCoords).rgb * diff;
 
     //specular
     viewDir = normalize(cameraPos - FragPos);
     vec3 reflectDir = normalize(reflect(lightDir, Normal));
     spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    specular += light.specular * texture(material.texture_specular, TexCoords).rgb * spec * specularStrength;
+    specular += spotLight.specular * texture(material.texture_specular, TexCoords).rgb * spec * specularStrength;
 
-    float proximity = (theta - light.outerCut_off) / (light.cut_off - light.outerCut_off);
+    float proximity = (theta - spotLight.outerCut_off) / (spotLight.cut_off - spotLight.outerCut_off);
     float intensity = clamp(proximity, 0.0, 1.0);
 
-
-    //ambient *= intensity;
     diffuse *= intensity;
     specular *= intensity;
 
     //attenuation
-    //float d = length(cameraPos - FragPos);
-    //float att = 1.0 / (1.0 + d * material.linearC + pow(d, 2) * material.quadraticC);
+    float d = length(cameraPos - FragPos);
+    float att = 1.0 / (1.0 + d * material.linearC + pow(d, 2) * material.quadraticC);
 
-    //ambient *= att;
-    //diffuse *= att;
-    //specular *= att;
+    ambient *= att;
+    diffuse *= att;
+    specular *= att;
 
     vec3 result = ambient + diffuse + specular;
 
-    //FragColor = vec4(result, 1.f);
+    FragColor = vec4(result, 1.f);
 }
