@@ -39,7 +39,8 @@ public:
     Light light;
     SpotLight spotLight;
     int moon_event = 2;
-
+    glm::vec3 spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
+    float spacecraft_rotation = glm::radians(0.f);
 };
 
 

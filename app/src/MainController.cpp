@@ -47,6 +47,18 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
         // 0 turning on
         // 1 shutting down
         mainController->moon_event = (mainController->moon_event + 1) % 2;
+    }else if(platform->key(engine::platform::KeyId::KEY_UP).is_down()) {
+            auto mainController = platform->get<MainController>();
+            mainController->spacecraft_pos.y = glm::min(mainController->spacecraft_pos.y + platform->dt() * 3.f, 30.f);
+    }else if(platform->key(engine::platform::KeyId::KEY_DOWN).is_down()) {
+        auto mainController = platform->get<MainController>();
+        mainController->spacecraft_pos.y = glm::max(mainController->spacecraft_pos.y - platform->dt() * 3.f, -2.f);
+    }else if(platform->key(engine::platform::KeyId::KEY_LEFT).is_down()) {
+        auto mainController = platform->get<MainController>();
+        mainController->spacecraft_rotation += platform->dt() * 1.f;
+    }else if(platform->key(engine::platform::KeyId::KEY_RIGHT).is_down()) {
+        auto mainController = platform->get<MainController>();
+        mainController->spacecraft_rotation -= platform->dt() * 1.f;
     }
 }
 
@@ -171,7 +183,8 @@ void MainController::draw_space_craft() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix           = glm::translate(model_matrix, glm::vec3(0.0f, -2.0f, -30.0f));
+    model_matrix           = glm::translate(model_matrix, spacecraft_pos);
+    model_matrix = glm::rotate(model_matrix, this->spacecraft_rotation, glm::vec3(0.f, 1.f, 0.f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.4f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);

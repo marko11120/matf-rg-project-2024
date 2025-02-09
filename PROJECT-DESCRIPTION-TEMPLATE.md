@@ -6,9 +6,16 @@
 ## Controls
 
 {ESC} -> {application terminate}  
-{BUTTON2} -> {ACTION2}  
-...  
-{BUTTONN} -> {ACTIONN}
+{E} -> {Moon on/off switch}   
+{W} -> {Camera forward}
+{S} -> {Camera backward}
+{A} -> {Camera left}
+{D} -> {Camera right}
+{UP} -> {Spacecraft up}
+{DOWN} -> {Spacecraft down}
+{LEFT} -> {Spacecraft rotate left}
+{RIGHT} -> {Spacecraft rotate right}
+{F12} -> {GUI enable}
 
 ## Features
 
