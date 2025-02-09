@@ -21,6 +21,8 @@ void main(){
 //#shader fragment
 #version 330 core
 
+uniform vec3 light_intensity;
+
 out vec4 FragColor;
 
 in vec2 TexCoords;
@@ -28,5 +30,5 @@ in vec2 TexCoords;
 uniform sampler2D texture_diffuse1;
 
 void main(){
-    FragColor = vec4(texture(texture_diffuse1, TexCoords).rgb, 1.0);
+    FragColor = vec4(light_intensity * texture(texture_diffuse1, TexCoords).rgb, 1.0);
 }

@@ -8,7 +8,8 @@
 #include <glm/glm.hpp>
 
 struct Light{
-    glm::vec3 position = glm::vec3(15.f, 30.f, -50.f);
+    glm::vec3 intensity = glm::vec3(1.f);
+    glm::vec3 position = glm::vec3(15.f, 30.f, -20.f);
     glm::vec3 ambient = glm::vec3(0.8f);
     glm::vec3 diffuse = glm::vec3(1.0f);
     glm::vec3 specular = glm::vec3(1.0f);
@@ -37,8 +38,8 @@ public:
     void update_camera();
     Light light;
     SpotLight spotLight;
-    bool moon_event = false;
-    std::pair<float, float> moon_position = {15.f, -120.f};
+    int moon_event = 2;
+
 };
 
 

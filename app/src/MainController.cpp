@@ -44,7 +44,9 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
         platform->set_cursor_visible(cursor_visibility);
     }else if(platform->key(engine::platform::KeyId::KEY_E).is_down()) {
         auto mainController = platform->get<MainController>();
-        mainController->moon_event = !mainController->moon_event;
+        // 0 turning on
+        // 1 shutting down
+        mainController->moon_event = (mainController->moon_event + 1) % 2;
     }
 }
 
@@ -90,26 +92,16 @@ void MainController::draw_moon() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
 
 
-
-    glm::mat4 model_matrix = glm::mat4(1.0f);
-    float timeValue        = 10 * platform->frame_time().current;
-    if (moon_event) {
-        glm::vec3 stationPosition(0.0f, -2.0f, -40.0f); // Space station position
-        float radius = -20.0f;
-        float rotationSpeed = 0.07f;
-        this->moon_position.first = stationPosition.x + radius * cos(timeValue * rotationSpeed);
-        this->moon_position.second = stationPosition.z + radius * sin(timeValue * rotationSpeed);
-
-        this->light.position = glm::vec3(
-            this->moon_position.first, this->light.position.y,
-            this->moon_position.second);
-
-        model_matrix = glm::translate(model_matrix, this->light.position);
-    }else {
-    //     this->light.position = glm::vec3(this->moon_position.first, 30.f, this->moon_position.second);
-    //     model_matrix           = glm::translate(model_matrix, this->light.position);
+    float timeValue        = platform->frame_time().current;
+    //float pom = (cos(timeValue) + 1)/2.f; // fade function
+    if (moon_event == 1) {
+        this->light.intensity = glm::vec3(0.2);
+    } else if (moon_event == 0) {
+        this->light.intensity = glm::vec3(1.f);
     }
 
+    shader->set_vec3("light_intensity", this->light.intensity);
+    glm::mat4 model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, this->light.position);
     model_matrix           = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.0f, 1.0f, 0.0f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.6f));
@@ -128,6 +120,7 @@ void MainController::draw_space_station() {
     shader->set_vec3("light.diffuse", this->light.diffuse);
     shader->set_vec3("light.specular", this->light.specular);
     shader->set_vec3("light.position", this->light.position);
+    shader->set_vec3("light.intensity", this->light.intensity);
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
     shader->set_float("spotLight.cut_off", this->spotLight.cut_off);
@@ -144,7 +137,7 @@ void MainController::draw_space_station() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix           = glm::translate(model_matrix, glm::vec3(0.0f, -7.f, -40.0f));
+    model_matrix           = glm::translate(model_matrix, glm::vec3(0.0f, -7.f, -30.0f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.08f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);
@@ -161,6 +154,7 @@ void MainController::draw_space_craft() {
     shader->set_vec3("light.diffuse", this->light.diffuse);
     shader->set_vec3("light.specular", this->light.specular);
     shader->set_vec3("light.position", this->light.position);
+    shader->set_vec3("light.intensity", this->light.intensity);
 
     shader->set_float("material.linearC", 0.003f);
     shader->set_float("material.quadraticC", 0.0001f);
@@ -177,7 +171,7 @@ void MainController::draw_space_craft() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix           = glm::translate(model_matrix, glm::vec3(0.0f, -2.0f, -40.0f));
+    model_matrix           = glm::translate(model_matrix, glm::vec3(0.0f, -2.0f, -30.0f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.4f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);
