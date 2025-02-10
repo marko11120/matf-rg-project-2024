@@ -1,8 +1,8 @@
-#include <engine/core/Engine.hpp>
+#include <memory>
+#include "MyApp.hpp"
 
-/**
- * Start here...
- */
 int main(int argc, char** argv) {
-    return 0;
+    auto app = std::make_unique<MyApp>();
+
+    return app->run(argc, argv);
 }

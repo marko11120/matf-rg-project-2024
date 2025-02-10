@@ -1,21 +1,28 @@
-# {NAME-OF-THE-PROJECT}
+# {Space station}
 
-{INDEX} - {STUDENT-FULL-NAME}  
-{PROJECT DESCRIPTION}
+{307/2023} - {Marko Perisic}  
+{Space station with spacecraft and little synthetic moon as its light source}
 
 ## Controls
 
-{BUTTON1} -> {ACTION1}  
-{BUTTON2} -> {ACTION2}  
-...  
-{BUTTONN} -> {ACTIONN}
+{ESC} -> {application terminate}  
+{E} -> {Moon on/off switch}   
+{W} -> {Camera forward}
+{S} -> {Camera backward}
+{A} -> {Camera left}
+{D} -> {Camera right}
+{UP} -> {Spacecraft up}
+{DOWN} -> {Spacecraft down}
+{LEFT} -> {Spacecraft rotate left}
+{RIGHT} -> {Spacecraft rotate right}
+{F12} -> {GUI enable}
 
 ## Features
 
 ### Fundamental:
 
-[ ] Model with lighting
-[ ] Two types of lighting with customizable colors and movement through GUI or ACTIONS
+[x] Model with lighting
+[x] Two types of lighting with customizable colors and movement through GUI or ACTIONS
 [ ] {ACTION_X} --- AFTER_M_SECONDS---Triggers---> {EVENT_A} ---> AFTER_N_SECONDS---Triggers---> {EVENT_B}
 
 ### Group A:

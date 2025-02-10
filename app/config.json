@@ -1,11 +1,20 @@
 {
   "resources": {
     "models": {
+      "Moon" : {
+        "path" : "Moon/Moon.obj"
+      },
+      "space_station": {
+       "path" : "space_station/space_station.obj"
+      },
+      "spacecraft2": {
+        "path" : "spacecraft2/scene.gltf"
+      }
     }
   },
   "window": {
-    "height": 600,
-    "title": "Hello, window!",
-    "width": 800
+    "height": 1080,
+    "title": "Space station",
+    "width": 1920
   }
 }

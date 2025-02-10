@@ -132,6 +132,12 @@ namespace engine::graphics {
         * @brief Clears GL_DEPTH_BUFFER_BIT, GL_COLOR_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
         */
         static void clear_buffers();
+#
+
+        static void create_framebuffer(unsigned int* framebuffer);
+        static void create_color_attachment(unsigned int* textureColorbuffer);
+        static void create_render_buffer(unsigned int* rbo);
+        static void configure_framebuffer_rectangle(float vertices[24], unsigned int* cubeVAO, unsigned int* cubeVBO);
 
         /**
         * @brief Retrieve the shader compilation error log message.

@@ -1,4 +1,3 @@
-
 #include <engine/graphics/Camera.hpp>
 
 namespace engine::graphics {
