@@ -82,6 +82,7 @@ namespace engine::graphics {
         /**
         * @brief Draws a @ref resources::Skybox with the @ref resources::Shader.
         */
+
         void draw_skybox(const resources::Shader *shader, const resources::Skybox *skybox);
 
         Camera *camera() {

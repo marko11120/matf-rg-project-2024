@@ -140,6 +140,11 @@ namespace engine::graphics {
         */
         static std::string get_compilation_error_message(uint32_t shader_id);
 
+        static void create_framebuffer(unsigned int* framebuffer);
+        static void create_color_attachment(unsigned int* textureColorbuffer);
+        static void create_render_buffer(unsigned int* rbo);
+        static void configure_framebuffer_rectangle(float vertices[24], unsigned int* cubeVAO, unsigned int* cubeVBO);
+
     private:
         /**
         * @brief Throws an engine::util::EngineError of type @ref engine::util::EngineError::Type::OpenGLError if an OpenGL error occurred. Used internally.

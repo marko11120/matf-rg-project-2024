@@ -1,14 +1,18 @@
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <engine/graphics/GraphicsController.hpp>
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
 #include <engine/resources/Skybox.hpp>
+#include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 
+#include "../../app/include/MainController.hpp"
+
+
+class MainController;
 namespace engine::graphics {
 
     void GraphicsController::initialize() {
@@ -84,4 +88,5 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glDepthFunc, GL_LESS); // set depth function back to default
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_CUBE_MAP, 0);
     }
+
 }

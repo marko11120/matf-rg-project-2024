@@ -1,14 +1,17 @@
-#include <unordered_set>
-#include <utility>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
 #include <engine/graphics/OpenGL.hpp>
+#include <engine/platform/PlatformController.hpp>
 #include <engine/resources/ResourcesController.hpp>
 #include <engine/resources/ShaderCompiler.hpp>
 #include <engine/util/Configuration.hpp>
 #include <engine/util/Errors.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <spdlog/spdlog.h>
+#include <unordered_set>
+#include <utility>
+
+#include "../../app/include/MainController.hpp"
 
 namespace engine::resources {
 
@@ -17,6 +20,19 @@ namespace engine::resources {
         load_models();
         load_textures();
         load_skyboxes();
+    }
+
+
+    void ResourcesController::configure_resources_framebuffering() {
+        auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+        auto mainController = platform->get<MainController>();
+
+        graphics::OpenGL::configure_framebuffer_rectangle(mainController->vertices, &mainController->vao, &mainController->vbo);
+
+        // kada ukljucim neku od sledecih linija imam undefined reference
+        // openGL->create_framebuffer(&mainController->framebuffer);
+        // graphics::OpenGL::create_color_attachment(&mainController->texture_colorbuffer);
+        // graphics::OpenGL::create_render_buffer(&mainController->rbo);
     }
 
     void ResourcesController::load_shaders() {

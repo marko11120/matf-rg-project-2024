@@ -1,13 +1,18 @@
 #include <glad/glad.h>
-#include <filesystem>
-#include <array>
-#include <stb_image.h>
+#include <engine/graphics/GraphicsController.hpp>
+
 #include <engine/graphics/OpenGL.hpp>
+#include <engine/platform/PlatformController.hpp>
 #include <engine/resources/Shader.hpp>
 #include <engine/resources/ShaderCompiler.hpp>
 #include <engine/resources/Skybox.hpp>
 #include <engine/util/Errors.hpp>
 #include <engine/util/Utils.hpp>
+#include <array>
+#include <filesystem>
+#include <stb_image.h>
+
+#include "spdlog/spdlog.h"
 
 namespace engine::graphics {
     int32_t OpenGL::shader_type_to_opengl_type(resources::ShaderType type) {
@@ -203,4 +208,43 @@ namespace engine::graphics {
         }
     }
 
+
+    void create_framebuffer(unsigned int* framebuffer) {
+        glGenFramebuffers(1, framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, *framebuffer);
+    }
+    void create_color_attachment(unsigned int* textureColorbuffer) {
+        glGenTextures(1, textureColorbuffer);
+        glBindTexture(GL_TEXTURE_2D, *textureColorbuffer);
+        int SCR_WIDTH = engine::core::Controller::get<engine::platform::PlatformController>()->window()->width();
+        int SCR_HEIGHT = engine::core::Controller::get<engine::platform::PlatformController>()->window()->height();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *textureColorbuffer, 0);
+    }
+    void create_render_buffer(unsigned int* rbo) {
+        glGenRenderbuffers(1, rbo);
+        glBindRenderbuffer(GL_RENDERBUFFER, *rbo);
+        int SCR_WIDTH = engine::core::Controller::get<engine::platform::PlatformController>()->window()->width();
+        int SCR_HEIGHT = engine::core::Controller::get<engine::platform::PlatformController>()->window()->height();
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, *rbo); // now actually attach it
+        // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            spdlog::info("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void configure_framebuffer_rectangle(float vertices[24], unsigned int* vao, unsigned int* vbo) {
+        glGenVertexArrays(1, vao);
+        glGenBuffers(1, vbo);
+        glBindVertexArray(*vao);
+        glBindBuffer(GL_ARRAY_BUFFER, *vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float)*24, &vertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    }
 };

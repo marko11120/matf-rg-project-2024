@@ -72,6 +72,9 @@ void MainController::initialize() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     platform->set_cursor_visible(false);
     platform->set_cursor_status(false);
+    auto resources                    = engine::core::Controller::get<engine::resources::ResourcesController>();
+
+    // resources->configure_resources_framebuffering();
 }
 
 bool MainController::loop() {
@@ -115,7 +118,7 @@ void MainController::draw_moon() {
     shader->set_vec3("light_intensity", this->light.intensity);
     glm::mat4 model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, this->light.position);
-    model_matrix           = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.0f, 1.0f, 0.0f));
+    model_matrix           = glm::rotate(model_matrix, glm::radians(5*timeValue), glm::vec3(1.0f, 1.0f, 0.0f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.6f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);
@@ -235,6 +238,9 @@ void MainController::draw_gui() {
 }
 
 void MainController::draw() {
+
+    // set up frame buffers and everything
+    draw_framebuffer_rectangle();
     draw_moon();
     draw_space_station();
     draw_space_craft();
@@ -245,6 +251,19 @@ void MainController::draw() {
     if (platform->get_cursor_status()) {
         draw_gui();
     }
+}
+
+void MainController::draw_framebuffer_rectangle() {
+    auto resources                    = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto graphics                     = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    engine::resources::Shader *shader = resources->shader("framebuffer_rectangle");
+
+
+
+    shader->use();
+    shader->set_int("texture1", 0);
+
+    // rest of the implementation
 }
 
 void MainController::end_draw() {

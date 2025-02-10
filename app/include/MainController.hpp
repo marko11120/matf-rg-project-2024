@@ -27,6 +27,7 @@ public:
     bool loop() override;
     void initialize() override;
     void begin_draw() override;
+    void draw_framebuffer_rectangle();
     void draw() override;
     void draw_skybox();
     void draw_moon();
@@ -41,6 +42,22 @@ public:
     int moon_event = 2;
     glm::vec3 spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float spacecraft_rotation = glm::radians(0.f);
+
+
+    unsigned int framebuffer;
+    unsigned int vao, vbo;// rectangle buff/att objects
+    unsigned int texture_colorbuffer; // color attachment
+    unsigned int rbo; // render buffer object
+    float vertices[24] = {
+        // positions   // texCoords
+        -1.0f,  1.0f,  0.0f, 1.0f,
+        -1.0f, -1.0f,  0.0f, 0.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+
+        -1.0f,  1.0f,  0.0f, 1.0f,
+         1.0f, -1.0f,  1.0f, 0.0f,
+         1.0f,  1.0f,  1.0f, 1.0f
+    }; // vertices for framebuffer rectangle
 };
 
 

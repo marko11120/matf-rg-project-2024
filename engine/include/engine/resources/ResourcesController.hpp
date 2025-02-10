@@ -70,6 +70,8 @@ namespace engine::resources {
         */
         Shader *shader(const std::string &name, const std::filesystem::path &path = "");
 
+        void configure_resources_framebuffering();
+
     private:
         /**
         * @brief Loads all the resources from the "resources/" directory.
@@ -95,6 +97,7 @@ namespace engine::resources {
         * @brief Loads and compile all the shaders from the "resources/shaders" directory. Called during @ref ResourcesController::initialize.
         */
         void load_shaders();
+
 
         /**
         * @brief A hashmap of all the loaded @ref Model.
