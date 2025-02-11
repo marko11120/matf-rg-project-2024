@@ -1,4 +1,3 @@
-
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -84,4 +83,36 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glDepthFunc, GL_LESS); // set depth function back to default
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_CUBE_MAP, 0);
     }
-}
+
+    unsigned int GraphicsController::get_vbo() {
+        return m_vbo;
+    }
+    unsigned int GraphicsController::get_vao() {
+        return m_vao;
+    }
+    unsigned int GraphicsController::get_rbo() {
+        return m_rbo;
+    }
+    unsigned int GraphicsController::get_framebuffer() {
+        return m_framebuffer;
+    }
+    unsigned int GraphicsController::get_texture_colorbuffer() {
+        return m_texture_colorbuffer;
+    }
+
+    void GraphicsController::set_vao(unsigned int value) {
+        m_vao = value;
+    }
+    void GraphicsController::set_rbo(unsigned int value) {
+        m_rbo = value;
+    }
+    void GraphicsController::set_vbo(unsigned int value) {
+        m_vbo = value;
+    }
+    void GraphicsController::set_framebuffer(unsigned int value) {
+        m_framebuffer = value;
+    }
+    void GraphicsController::set_texture_colorbuffer(unsigned int value) {
+        m_texture_colorbuffer = value;
+    }
+} // namespace engine::graphics

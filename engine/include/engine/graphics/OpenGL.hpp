@@ -134,11 +134,14 @@ namespace engine::graphics {
         static void clear_buffers();
 #
 
-        static void create_framebuffer(unsigned int* framebuffer);
-        static void create_color_attachment(unsigned int* textureColorbuffer);
-        static void create_render_buffer(unsigned int* rbo);
-        static void configure_framebuffer_rectangle(float vertices[24], unsigned int* cubeVAO, unsigned int* cubeVBO);
-
+        static unsigned int create_framebuffer();
+        static unsigned int create_color_attachment(int SCR_WIDTH, int SCR_HEIGHT);
+        static unsigned int create_render_buffer(int SCR_WIDTH, int SCR_HEIGHT);
+        static void configure_framebuffer_rectangle(unsigned int* cubeVAO, unsigned int* cubeVBO);
+        static void bind_framebuffer(unsigned int framebuffer);
+        static void bind_colorbuffer(unsigned int colorbuffer);
+        static void bind_buffer(unsigned int bufferId);
+        static void draw_arrays(int x);
         /**
         * @brief Retrieve the shader compilation error log message.
         * @param shader_id Shader id for which the compilation failed.

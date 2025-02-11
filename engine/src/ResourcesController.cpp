@@ -9,16 +9,9 @@
 #include <engine/resources/ShaderCompiler.hpp>
 #include <engine/util/Configuration.hpp>
 #include <engine/util/Errors.hpp>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
 #include <spdlog/spdlog.h>
-#include <unordered_set>
 
 
-#include <utility>
-
-#include "../../app/include/MainController.hpp"
 
 namespace engine::resources {
 
@@ -30,17 +23,7 @@ namespace engine::resources {
     }
 
 
-    void ResourcesController::configure_resources_framebuffering() {
-        auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-        auto mainController = platform->get<MainController>();
 
-
-        // kada ukljucim neku od sledecih linija imam undefined reference
-        // graphics::OpenGL::configure_framebuffer_rectangle(mainController->vertices, &mainController->vao,&mainController->vbo);
-        // openGL->create_framebuffer(&mainController->framebuffer);
-        // graphics::OpenGL::create_color_attachment(&mainController->texture_colorbuffer);
-        // graphics::OpenGL::create_render_buffer(&mainController->rbo);
-    }
 
     void ResourcesController::load_shaders() {
         if (!exists(m_shaders_path)) {

@@ -285,9 +285,9 @@ namespace engine::platform {
         auto window = platform->window()->handle_();
 
         if(flag)
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            CHECKED_GL_CALL(glfwSetInputMode, window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         else {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            CHECKED_GL_CALL(glfwSetInputMode, window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
 
