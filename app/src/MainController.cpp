@@ -3,11 +3,12 @@
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
 #include <engine/resources/ResourcesController.hpp>
+#include <Framebuffer.hpp>
 #include <MainController.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
 #include "spdlog/spdlog.h"
-#include <Framebuffer.hpp>
+#include "MoonEvent.hpp"
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
 private:
@@ -99,9 +100,9 @@ void MainController::draw_moon() {
     float timeValue = platform->frame_time().current;
     // float pom = (cos(timeValue) + 1)/2.f; // fade function
     if (moon_event == 1) {
-        m_light.intensity = glm::vec3(0.2);
+        m_light.intensity = MoonEvent::turn_off();
     } else if (moon_event == 0) {
-        m_light.intensity = glm::vec3(1.f);
+        m_light.intensity = MoonEvent::turn_on();
     }
 
     shader->set_vec3("light_intensity", m_light.intensity);
@@ -280,3 +281,5 @@ void MainController::update_camera() {
         camera->move_camera(engine::graphics::Camera::RIGHT, delta);
     }
 }
+
+

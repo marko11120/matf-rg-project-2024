@@ -7,6 +7,7 @@
 #include <engine/core/Controller.hpp>
 #include <glm/glm.hpp>
 #include "Framebuffer.hpp"
+#include "MoonEvent.hpp"
 
 struct Light{
     glm::vec3 intensity = glm::vec3(1.f);
@@ -24,6 +25,7 @@ struct SpotLight {
 };
 
 class MainController : public engine::core::Controller {
+    friend class MoonEvent;
 public:
     int moon_event = 2;
     glm::vec3 spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
