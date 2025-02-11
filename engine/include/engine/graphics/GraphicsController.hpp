@@ -152,20 +152,6 @@ namespace engine::graphics {
         }
 
 
-        unsigned int get_vbo();
-        unsigned int get_vao();
-        unsigned int get_rbo();
-        unsigned int get_framebuffer();
-        unsigned int get_texture_colorbuffer();
-
-        void set_vao(unsigned int value);
-        void set_rbo(unsigned int value);
-        void set_vbo(unsigned int value);
-        void set_framebuffer(unsigned int value);
-        void  set_texture_colorbuffer(unsigned int value);
-
-        // same for setters
-
     private:
         /**
         * @brief Initializes OpenGL, ImGUI, and projection matrix params;
@@ -180,7 +166,6 @@ namespace engine::graphics {
         glm::mat4 m_projection_matrix{};
         Camera m_camera{};
         ImGuiContext *m_imgui_context{};
-        unsigned int m_vbo, m_vao, m_rbo, m_framebuffer, m_texture_colorbuffer;
     };
 
     /**

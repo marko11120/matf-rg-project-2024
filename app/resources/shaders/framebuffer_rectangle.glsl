@@ -23,8 +23,8 @@ const float offset = 1.0 / 300.0;
 
 void main()
 {
-#if 0 // normal rendering
-    vec3 col = vec4texture(screenTexture, TexCoords).rgb;
+#if 1 // normal rendering
+    vec3 col = texture(screenTexture, TexCoords).rgb;
     FragColor = vec4(col, 1.0);
 #elif 0 // inversion
     FragColor = vec4(vec3(1.0 - texture(screenTexture, TexCoords)), 1.0);
@@ -32,7 +32,7 @@ void main()
     FragColor = texture(screenTexture, TexCoords);
     float average = (0.2 * FragColor.r + 0.7*FragColor.g + 0.07*FragColor.b) / 3.0;
     FragColor = vec4(average, average, average, 1.0);
-#else
+#elif 0
     vec2 offsets[9] = vec2[](
         vec2(-offset, offset), // top/left
         vec2(0.0f, offset), // top-center

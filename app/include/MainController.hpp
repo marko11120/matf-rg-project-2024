@@ -6,6 +6,7 @@
 #define MAINCONTROLLER_HPP
 #include <engine/core/Controller.hpp>
 #include <glm/glm.hpp>
+#include "Framebuffer.hpp"
 
 struct Light{
     glm::vec3 intensity = glm::vec3(1.f);
@@ -23,6 +24,10 @@ struct SpotLight {
 };
 
 class MainController : public engine::core::Controller {
+public:
+    int moon_event = 2;
+    glm::vec3 spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
+    float spacecraft_rotation = glm::radians(0.f);
 private:
     bool loop() override;
     void initialize() override;
@@ -38,13 +43,8 @@ private:
     void update() override;
     void update_camera();
     Light m_light;
-    SpotLight m_spotLight;
-    void configure_resources_framebuffering();
-public:
-    int moon_event = 2;
-    glm::vec3 spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
-    float spacecraft_rotation = glm::radians(0.f);
-
+    SpotLight m_spot_light;
+    Framebuffer* m_framebuffer;
 };
 
 

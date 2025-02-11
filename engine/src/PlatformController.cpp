@@ -283,11 +283,12 @@ namespace engine::platform {
     void PlatformController::set_cursor_visible(bool flag) {
         auto platform = engine::core::Controller::get<platform::PlatformController>();
         auto window = platform->window()->handle_();
+        m_cursor_visible = flag;
 
         if(flag)
-            CHECKED_GL_CALL(glfwSetInputMode, window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         else {
-            CHECKED_GL_CALL(glfwSetInputMode, window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
 
@@ -295,7 +296,4 @@ namespace engine::platform {
         return m_cursor_visible;
     }
 
-    void PlatformController::set_cursor_status(bool status) {
-        m_cursor_visible = status;
-    }
 } // namespace engine
