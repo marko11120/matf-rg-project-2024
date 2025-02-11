@@ -151,6 +151,7 @@ namespace engine::graphics {
             return m_ortho_params;
         }
 
+
     private:
         /**
         * @brief Initializes OpenGL, ImGUI, and projection matrix params;

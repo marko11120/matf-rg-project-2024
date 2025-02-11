@@ -4,11 +4,14 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <engine/graphics/OpenGL.hpp>
+#include <engine/platform/PlatformController.hpp>
 #include <engine/resources/ResourcesController.hpp>
 #include <engine/resources/ShaderCompiler.hpp>
 #include <engine/util/Configuration.hpp>
 #include <engine/util/Errors.hpp>
 #include <spdlog/spdlog.h>
+
+
 
 namespace engine::resources {
 
@@ -18,6 +21,9 @@ namespace engine::resources {
         load_textures();
         load_skyboxes();
     }
+
+
+
 
     void ResourcesController::load_shaders() {
         if (!exists(m_shaders_path)) {

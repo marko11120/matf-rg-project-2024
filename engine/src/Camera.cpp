@@ -1,4 +1,3 @@
-
 #include <engine/graphics/Camera.hpp>
 #include <engine/platform/PlatformController.hpp>
 

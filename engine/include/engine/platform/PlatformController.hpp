@@ -132,7 +132,7 @@ namespace engine::platform {
 
         void set_cursor_visible(bool flag);
         bool get_cursor_status();
-        void set_cursor_status(bool status);
+
     private:
         Key &key_ref(KeyId key);
 

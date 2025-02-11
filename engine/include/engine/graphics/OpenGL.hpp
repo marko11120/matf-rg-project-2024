@@ -132,7 +132,16 @@ namespace engine::graphics {
         * @brief Clears GL_DEPTH_BUFFER_BIT, GL_COLOR_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
         */
         static void clear_buffers();
+#
 
+        static unsigned int create_framebuffer();
+        static unsigned int create_color_attachment(int SCR_WIDTH, int SCR_HEIGHT);
+        static unsigned int create_render_buffer(int SCR_WIDTH, int SCR_HEIGHT);
+        static void configure_framebuffer_rectangle(unsigned int* cubeVAO, unsigned int* cubeVBO);
+        static void bind_framebuffer(unsigned int framebuffer);
+        static void bind_colorbuffer(unsigned int colorbuffer);
+        static void bind_buffer(unsigned int bufferId);
+        static void draw_arrays(int x);
         /**
         * @brief Retrieve the shader compilation error log message.
         * @param shader_id Shader id for which the compilation failed.
