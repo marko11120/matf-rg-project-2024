@@ -284,12 +284,10 @@ void MainController::draw_gui() {
 }
 
 void MainController::draw() {
-    engine::graphics::OpenGL::bind_framebuffer(m_framebuffer->get_framebuffer());
+    engine::graphics::OpenGL::bind_framebuffer(0);
     engine::graphics::OpenGL::enable_depth_testing();
-    engine::graphics::OpenGL::clear_buffers();
 
     draw_moon();
-    draw_meteors();
     draw_space_station();
     draw_space_craft();
     draw_skybox();
@@ -298,15 +296,22 @@ void MainController::draw() {
         draw_gui();
     }
 
+    engine::graphics::OpenGL::bind_framebuffer(m_framebuffer->get_framebuffer());
+    // setting framebuffer background to be transparent
+    engine::graphics::OpenGL::clear_color(0.0f, 0.0f, 0.0f, 0.0f);
+    draw_meteors();
+
+    engine::graphics::OpenGL::bind_framebuffer(0);
+    engine::graphics::OpenGL::disable_depth_testing();
+
+    // blending so the transparency could be forwarded
+    engine::graphics::OpenGL::blend();
 
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("framebuffer_rectangle");
     shader->use();
     shader->set_int("screenTexture", 0);
-    engine::graphics::OpenGL::bind_framebuffer(0);
-    engine::graphics::OpenGL::disable_depth_testing();
-    engine::graphics::OpenGL::clear_buffers();
-    
+
     m_framebuffer->draw_framebuffer_rectangle();
 }
 
