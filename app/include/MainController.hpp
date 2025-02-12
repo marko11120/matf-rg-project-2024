@@ -37,6 +37,7 @@ private:
     void draw() override;
     void draw_framebuffer_rectangle();
     void draw_skybox();
+    void draw_meteors();
     void draw_moon();
     void draw_space_station();
     void draw_space_craft();

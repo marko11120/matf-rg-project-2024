@@ -8,7 +8,7 @@ include_directories(include/)
 add_executable(${PROJECT_NAME} ${sources} ${headers}
         src/Framebuffer.cpp
         include/Framebuffer.hpp
-        include/MoonEvent.cpp
+        src/MoonEvent.cpp
         include/MoonEvent.hpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE matf-rg-engine)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)

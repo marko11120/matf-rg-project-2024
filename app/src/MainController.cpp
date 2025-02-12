@@ -87,11 +87,68 @@ void MainController::draw_skybox() {
     graphics->draw_skybox(shader, skybox);
 }
 
+void MainController::draw_meteors() {
+    auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
+    auto shader    = resources->shader("meteor");
+    auto model1 = resources->model("meteor1"); // smaller one
+    auto model2 = resources->model("meteor2"); // biger one
+    auto graphics                     = engine::core::Controller::get<engine::graphics::GraphicsController>();
+
+    shader->use();
+    shader->set_mat4("projection", graphics->projection_matrix());
+    shader->set_mat4("view", graphics->camera()->view_matrix());
+    shader->set_vec3("cameraPos", graphics->camera()->Position);
+
+    shader->set_vec3("light.ambient", m_light.ambient);
+    shader->set_vec3("light.diffuse", m_light.diffuse);
+    shader->set_vec3("light.specular", m_light.specular);
+    shader->set_vec3("light.position", m_light.position);
+    shader->set_vec3("light.intensity", m_light.intensity);
+
+    shader->set_vec3("spotLight.direction", graphics->camera()->Front);
+    shader->set_float("spotLight.cut_off", m_spot_light.cut_off);
+    shader->set_float("spotLight.outerCut_off", m_spot_light.outterCut_off);
+    shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
+    shader->set_vec3("spotLight.specular", m_spot_light.specular);
+
+    shader->set_float("material.linearC", 0.003f);
+    shader->set_float("material.quadraticC", 0.0001f);
+    shader->set_float("material.shininess", 32.f);
+
+
+    static glm::vec3 positions [] = {
+        glm::vec3(-29.0f,  -17.0f, -28.0f), // first three positiions are for bigger meteor
+        glm::vec3(10.0f, 10.0f, -38.0f),
+        glm::vec3(20.0f, 5.0f, -10.0f),
+        glm::vec3(-14.0f, 8.0f, -10.0f),  // second three positions are for smaller meteor
+        glm::vec3(13.0f, -7.0f, -5.0f),
+        glm::vec3(0.0f, -10.0f, -8.0f)
+    };
+
+    glm::mat4 model_matrix = glm::mat4(1.0f);
+
+    auto platform                     = engine::core::Controller::get<engine::platform::PlatformController>();
+    for(int i = 0; i < 3; i++) {
+        model_matrix = glm::translate(model_matrix, positions[i]);
+        float timeValue = platform->frame_time().current;
+        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue*2), glm::vec3(1.f, 1.f, 1.f));
+        model_matrix = glm::scale(model_matrix, glm::vec3(0.3f));
+        shader->set_mat4("model", model_matrix);
+        model2->draw(shader);
+        model_matrix = glm::mat4(1.f);
+        model_matrix = glm::translate(model_matrix, positions[i+3]); // i + 3 for second three positions
+        shader->set_mat4("model", model_matrix);
+        model1->draw(shader);
+
+    }
+}
+
+
 void MainController::draw_moon() {
     auto resources                    = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto graphics                     = engine::core::Controller::get<engine::graphics::GraphicsController>();
-    engine::resources::Model *model   = resources->model("Moon");
-    engine::resources::Shader *shader = resources->shader("moon");
+    auto model   = resources->model("Moon");
+    auto shader = resources->shader("moon");
     auto platform                     = engine::core::Controller::get<engine::platform::PlatformController>();
     shader->use();
     shader->set_mat4("projection", graphics->projection_matrix());
@@ -232,6 +289,7 @@ void MainController::draw() {
     engine::graphics::OpenGL::clear_buffers();
 
     draw_moon();
+    draw_meteors();
     draw_space_station();
     draw_space_craft();
     draw_skybox();
@@ -245,7 +303,10 @@ void MainController::draw() {
     auto shader = resources->shader("framebuffer_rectangle");
     shader->use();
     shader->set_int("screenTexture", 0);
-
+    engine::graphics::OpenGL::bind_framebuffer(0);
+    engine::graphics::OpenGL::disable_depth_testing();
+    engine::graphics::OpenGL::clear_buffers();
+    
     m_framebuffer->draw_framebuffer_rectangle();
 }
 

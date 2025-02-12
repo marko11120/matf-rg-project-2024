@@ -9,6 +9,12 @@
       },
       "spacecraft2": {
         "path" : "spacecraft2/scene.gltf"
+      },
+      "meteor2": {
+        "path" : "meteor2/meteor.obj"
+      },
+      "meteor1": {
+        "path" : "meteor1/meteor.obj"
       }
     }
   },
