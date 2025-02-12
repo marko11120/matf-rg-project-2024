@@ -178,6 +178,14 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glClear, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
+    void OpenGL::blend() {
+        CHECKED_GL_CALL(glEnable, GL_BLEND);
+        CHECKED_GL_CALL(glBlendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    void OpenGL::clear_color(float a, float b, float c, float d) {
+        CHECKED_GL_CALL(glClearColor, a, b, c, d);
+        CHECKED_GL_CALL(glClear, GL_COLOR_BUFFER_BIT);
+    }
     uint32_t face_index(std::string_view name) {
         if (name == "right") {
             return 0;

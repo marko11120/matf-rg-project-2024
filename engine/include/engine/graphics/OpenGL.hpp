@@ -140,6 +140,8 @@ namespace engine::graphics {
         static void configure_framebuffer_rectangle(unsigned int* cubeVAO, unsigned int* cubeVBO);
         static void bind_framebuffer(unsigned int framebuffer);
         static void bind_colorbuffer(unsigned int colorbuffer);
+        static void blend();
+        static void clear_color(float a, float b, float c, float d);
         static void bind_buffer(unsigned int bufferId);
         static void draw_arrays(int x);
         /**
