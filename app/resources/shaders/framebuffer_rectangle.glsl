@@ -23,7 +23,7 @@ const float offset = 1.0 / 300.0;
 
 void main()
 {
-#if 0 // normal rendering
+#if 1 // normal rendering
     vec3 col = texture(screenTexture, TexCoords).rgb;
     FragColor = vec4(col, 1.0);
 #elif 0 // inversion

@@ -289,18 +289,16 @@ void MainController::draw() {
     engine::graphics::OpenGL::enable_depth_testing();
     engine::graphics::OpenGL::clear_buffers();
 
-
     draw_meteors();
-    draw_moon();
-    draw_space_station();
-     draw_space_craft();
-    draw_skybox();
+    // draw_moon();
+    // draw_space_station();
+    // draw_space_craft();
+    // draw_skybox();
 
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     if (platform->get_cursor_status()) {
         draw_gui();
     }
-
 
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("framebuffer_rectangle");
@@ -308,7 +306,6 @@ void MainController::draw() {
     shader->set_int("screenTexture", 0);
 
     m_framebuffer->unbind();
-
     m_framebuffer->draw_framebuffer_rectangle();
 }
 
