@@ -130,16 +130,17 @@ void MainController::draw_meteors() {
     auto platform                     = engine::core::Controller::get<engine::platform::PlatformController>();
     for(int i = 0; i < 3; i++) {
         model_matrix = glm::translate(model_matrix, positions[i]);
-        float timeValue = platform->frame_time().current;
-        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue*2), glm::vec3(1.f, 1.f, 1.f));
+        float timeValue = 2*platform->frame_time().current;
+        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 0.f, 1.f));
         model_matrix = glm::scale(model_matrix, glm::vec3(0.3f));
         shader->set_mat4("model", model_matrix);
         model2->draw(shader);
         model_matrix = glm::mat4(1.f);
         model_matrix = glm::translate(model_matrix, positions[i+3]); // i + 3 for second three positions
+        timeValue = 2*platform->frame_time().current;
+        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 0.f, 1.f));
         shader->set_mat4("model", model_matrix);
         model1->draw(shader);
-
     }
 }
 
@@ -284,33 +285,29 @@ void MainController::draw_gui() {
 }
 
 void MainController::draw() {
-    engine::graphics::OpenGL::bind_framebuffer(0);
+    m_framebuffer->bind();
     engine::graphics::OpenGL::enable_depth_testing();
+    engine::graphics::OpenGL::clear_buffers();
 
+
+    draw_meteors();
     draw_moon();
     draw_space_station();
-    draw_space_craft();
+     draw_space_craft();
     draw_skybox();
+
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     if (platform->get_cursor_status()) {
         draw_gui();
     }
 
-    engine::graphics::OpenGL::bind_framebuffer(m_framebuffer->get_framebuffer());
-    // setting framebuffer background to be transparent
-    engine::graphics::OpenGL::clear_color(0.0f, 0.0f, 0.0f, 0.0f);
-    draw_meteors();
-
-    engine::graphics::OpenGL::bind_framebuffer(0);
-    engine::graphics::OpenGL::disable_depth_testing();
-
-    // blending so the transparency could be forwarded
-    engine::graphics::OpenGL::blend();
 
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("framebuffer_rectangle");
     shader->use();
     shader->set_int("screenTexture", 0);
+
+    m_framebuffer->unbind();
 
     m_framebuffer->draw_framebuffer_rectangle();
 }
@@ -347,5 +344,3 @@ void MainController::update_camera() {
         camera->move_camera(engine::graphics::Camera::RIGHT, delta);
     }
 }
-
-

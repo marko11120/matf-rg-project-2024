@@ -215,7 +215,6 @@ namespace engine::graphics {
         }
     }
 
-
     unsigned int OpenGL::create_framebuffer() {
         unsigned int framebuffer;
         CHECKED_GL_CALL(glGenFramebuffers, 1, &framebuffer);
@@ -250,14 +249,12 @@ namespace engine::graphics {
         return rbo;
     }
 
-
     void OpenGL::bind_framebuffer(unsigned int framebuffer) {
         CHECKED_GL_CALL(glBindFramebuffer, GL_FRAMEBUFFER, framebuffer);
     }
 
     void OpenGL::bind_colorbuffer(unsigned int colorbuffer) {
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, colorbuffer);
-
     }
 
     void OpenGL::bind_buffer(unsigned int bufferId) {
@@ -269,7 +266,7 @@ namespace engine::graphics {
     }
 
 
-    void OpenGL::configure_framebuffer_rectangle(unsigned int* vao, unsigned int* vbo) {
+    unsigned int OpenGL::configure_framebuffer_rectangle() {
         float vertices[] = {
             // positions   // texCoords
             -1.0f,  1.0f,  0.0f, 1.0f,
@@ -280,15 +277,20 @@ namespace engine::graphics {
              1.0f, -1.0f,  1.0f, 0.0f,
              1.0f,  1.0f,  1.0f, 1.0f
         };
-        CHECKED_GL_CALL(glGenVertexArrays, 1, vao);
-        CHECKED_GL_CALL(glGenBuffers, 1, vbo);
-        CHECKED_GL_CALL(glBindVertexArray, *vao);
-        CHECKED_GL_CALL(glBindBuffer, GL_ARRAY_BUFFER, *vbo);
+
+        unsigned int vbo;
+        unsigned int vao;
+        CHECKED_GL_CALL(glGenVertexArrays, 1, &vao);
+        CHECKED_GL_CALL(glGenBuffers, 1, &vbo);
+        CHECKED_GL_CALL(glBindVertexArray, vao);
+        CHECKED_GL_CALL(glBindBuffer, GL_ARRAY_BUFFER, vbo);
         CHECKED_GL_CALL(glBufferData, GL_ARRAY_BUFFER, sizeof(float)*24, &vertices, GL_STATIC_DRAW);
         CHECKED_GL_CALL(glEnableVertexAttribArray, 0);
         CHECKED_GL_CALL(glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
         CHECKED_GL_CALL(glEnableVertexAttribArray, 1);
         CHECKED_GL_CALL(glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+        return vao;
     }
 
 };

@@ -137,7 +137,7 @@ namespace engine::graphics {
         static unsigned int create_framebuffer();
         static unsigned int create_color_attachment(int SCR_WIDTH, int SCR_HEIGHT);
         static unsigned int create_render_buffer(int SCR_WIDTH, int SCR_HEIGHT);
-        static void configure_framebuffer_rectangle(unsigned int* cubeVAO, unsigned int* cubeVBO);
+        static unsigned int configure_framebuffer_rectangle();
         static void bind_framebuffer(unsigned int framebuffer);
         static void bind_colorbuffer(unsigned int colorbuffer);
         static void blend();
