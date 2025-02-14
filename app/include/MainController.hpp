@@ -10,7 +10,7 @@
 #include "MoonEvent.hpp"
 
 struct Light{
-    glm::vec3 intensity = glm::vec3(1.f);
+    glm::vec3 intensity = glm::vec3(1.5f);
     glm::vec3 position = glm::vec3(15.f, 30.f, -20.f);
     glm::vec3 ambient = glm::vec3(0.8f);
     glm::vec3 diffuse = glm::vec3(1.0f);
@@ -28,6 +28,7 @@ class MainController : public engine::core::Controller {
     friend class MoonEvent;
 public:
     int moon_event = 2;
+    int bloom = 1;
     glm::vec3 spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float spacecraft_rotation = glm::radians(0.f);
 private:

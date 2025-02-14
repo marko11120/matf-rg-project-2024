@@ -10,5 +10,5 @@ glm::vec3 MoonEvent::turn_off() {
 }
 
 glm::vec3 MoonEvent::turn_on() {
-    return glm::vec3(1.0);
+    return glm::vec3(1.5f);
 }

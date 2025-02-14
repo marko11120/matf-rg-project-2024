@@ -147,12 +147,14 @@ namespace engine::graphics {
         static void bind_buffer(unsigned int bufferId);
         static void draw_arrays(int x);
         static unsigned int copy_stencil_to_texture();
-        static void activate_stencil_texture(unsigned int stencil_texture);
+        static void activate_texture(unsigned int texture, int slot);
         static void enable_stencil_testing();
         static void disable_stencil_writing();
         static void stencil_func(std::string func, int ref, unsigned int mask);
         static void stencil_op(std::string sfail, std::string dfail, std::string dpass);
         static void stencil_mask(int mask);
+        static void bloom_color_buffers(unsigned int color_buffers[], int SCR_WIDTH, int SCR_HEIGHT);
+
         /**
         * @brief Retrieve the shader compilation error log message.
         * @param shader_id Shader id for which the compilation failed.

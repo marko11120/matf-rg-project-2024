@@ -52,6 +52,8 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
         main_controller->spacecraft_rotation += platform->dt() * 1.f;
     } else if (platform->key(engine::platform::KeyId::KEY_RIGHT).is_down()) {
         main_controller->spacecraft_rotation -= platform->dt() * 1.f;
+    } else if (platform->key(engine::platform::KeyId::KEY_B).is_down()) {
+        main_controller->bloom = (main_controller->bloom + 1) % 2;
     }
 }
 
@@ -64,9 +66,12 @@ void MainController::initialize() {
     platform->set_cursor_visible(false);
 
     m_framebuffer = new Framebuffer();
-    m_framebuffer->enable_stencil_testing();
-    m_framebuffer->stencil_func("equal", 1, 0XFF);
-    m_framebuffer->stencil_op("zero", "keep", "replace");
+    // m_framebuffer->enable_stencil_testing();
+    // m_framebuffer->stencil_func("equal", 1, 0XFF);
+    // m_framebuffer->stencil_op("zero", "keep", "replace");
+
+    m_framebuffer->bind();
+    m_framebuffer->bloom_color_buffers();
 }
 
 bool MainController::loop() {
@@ -291,10 +296,12 @@ void MainController::draw() {
     engine::graphics::OpenGL::enable_depth_testing();
     engine::graphics::OpenGL::clear_buffers();
 
+
     // setting mask arg to zero so ref and buff value would be masked to zero
-    m_framebuffer->disable_stencil_writing();
+    // m_framebuffer->disable_stencil_writing();
 
     draw_meteors();
+    draw_moon();
     draw_space_station();
     draw_space_craft();
     draw_skybox();
@@ -304,23 +311,26 @@ void MainController::draw() {
     }
 
     // writing ones in buffer for all fragments that will be rendered
-    m_framebuffer->stencil_func("always", 1, 0xFF);
-    m_framebuffer->stencil_mask(0xFF);
-
-    draw_moon();
+    //m_framebuffer->stencil_func("always", 1, 0xFF);
+    //m_framebuffer->stencil_mask(0xFF);
+    m_framebuffer->unbind();
+    m_framebuffer->bind_bloom_textures();
 
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("framebuffer_rectangle");
     // copying stencil buffer to texture so we can use it in shader
-    m_framebuffer->copy_stencil_to_texture();
+    //m_framebuffer->copy_stencil_to_texture();
     //activate slot 1 and bind stencil_texture to that slot
-    m_framebuffer->activate_stencil_texture();
+    //m_framebuffer->activate_stencil_texture(1);
     shader->use();
+    shader->set_int("bloomSwitch", bloom);
     shader->set_int("screenTexture", 0);
+    shader->set_int("bloomTexture", 1);
+
     // using slot 1 for stencilTexture
-    shader->set_int("stencilTexture", 2);
-    m_framebuffer->unbind();
-    engine::graphics::OpenGL::disable_depth_testing();
+    //shader->set_int("stencilTexture", 1);
+
+
     m_framebuffer->draw_framebuffer_rectangle();
 }
 

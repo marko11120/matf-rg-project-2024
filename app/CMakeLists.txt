@@ -9,7 +9,9 @@ add_executable(${PROJECT_NAME} ${sources} ${headers}
         src/Framebuffer.cpp
         include/Framebuffer.hpp
         src/MoonEvent.cpp
-        include/MoonEvent.hpp)
+        include/MoonEvent.hpp
+        include/Bloom.cpp
+        include/Bloom.hpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE matf-rg-engine)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")

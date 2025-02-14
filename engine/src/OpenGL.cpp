@@ -295,7 +295,7 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glEnable, GL_STENCIL_TEST);
     }
     void OpenGL::disable_stencil_writing() {
-        CHECKED_GL_CALL(glStencilMask, 0xFF);
+        CHECKED_GL_CALL(glStencilMask, 0x00);
     }
     void OpenGL::stencil_func(std::string func, int ref, unsigned int mask) {
         GLenum func_;
@@ -350,7 +350,7 @@ namespace engine::graphics {
         auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
         int width     = platform->window()->width();
         int height    = platform->window()->height();
-        GLuint stencil_texture;
+        unsigned int stencil_texture;
         CHECKED_GL_CALL(glGenTextures, 1, &stencil_texture);
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
         CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
@@ -372,11 +372,30 @@ namespace engine::graphics {
 
         return stencil_texture;
     }
-    void OpenGL::activate_stencil_texture(unsigned int stencil_texture) {
-        CHECKED_GL_CALL(glActiveTexture, GL_TEXTURE2);
-        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
+    void OpenGL::activate_texture(unsigned int texture, int slot) {
+        CHECKED_GL_CALL(glActiveTexture, GL_TEXTURE0 + slot);
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, texture);
     }
 
+    void OpenGL::bloom_color_buffers(unsigned int buffers[], int SCR_WIDTH, int SCR_HEIGHT) {
+        unsigned int colorBuffers[2];
+        CHECKED_GL_CALL(glGenTextures, 2, colorBuffers);
+        for (unsigned int i = 0; i < 2; i++)
+        {
+            CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, colorBuffers[i]);
+            CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, nullptr);
+            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            // attach texture to framebuffer
+            CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
+        }
 
+        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+        CHECKED_GL_CALL(glDrawBuffers, 2, attachments);
 
+        buffers[0] = colorBuffers[0];
+        buffers[1] = colorBuffers[1];
+    }
 };

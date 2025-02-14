@@ -18,18 +18,20 @@ out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
+uniform sampler2D bloomTexture;
 uniform sampler2D stencilTexture;
+uniform int bloomSwitch;
 
 const float offset = 1.0 / 300.0;
 
 void main()
 {
 #if 0 // normal rendering
-    vec3 col = texture(screenTexture, TexCoords).rgb;
+    vec3 col = texture(bloomTexture, TexCoords).rgb;
     FragColor = vec4(col, 1.0);
 #elif 0 // inversion
     FragColor = vec4(vec3(1.0 - texture(screenTexture, TexCoords)), 1.0);
-#elif stencilTexture == 1 // blur
+#elif 1 // blur
 vec2 offsets[9] = vec2[](
         vec2(-offset, offset), // top/left
         vec2(0.0f, offset), // top-center
@@ -50,13 +52,16 @@ float kernel[9] = float[](
 
     vec3 sampleTex[9];
     for (int i = 0; i < 9; ++i) {
-        sampleTex[i] = vec3(texture(screenTexture, TexCoords.st + offsets[i]));
+        sampleTex[i] = vec3(texture(bloomTexture, TexCoords.st + offsets[i]));
     }
 
     vec3 col = vec3(0.0);
     for (int i = 0; i < 9; ++i) {
         col += sampleTex[i] * kernel[i];
     }
-    FragColor = vec4(col, 1.0);
+
+    vec3 screenColor = texture(screenTexture, TexCoords).rgb;
+    vec3 result = screenColor + bloomSwitch * col;
+    FragColor = vec4(result, 1.f);
 #endif
 }
