@@ -64,6 +64,9 @@ void MainController::initialize() {
     platform->set_cursor_visible(false);
 
     m_framebuffer = new Framebuffer();
+    m_framebuffer->enable_stencil_testing();
+    m_framebuffer->stencil_func("equal", 1, 0XFF);
+    m_framebuffer->stencil_op("zero", "keep", "replace");
 }
 
 bool MainController::loop() {
@@ -76,7 +79,6 @@ bool MainController::loop() {
 void MainController::begin_draw() {
     engine::graphics::OpenGL::clear_buffers();
 }
-
 
 
 void MainController::draw_skybox() {
@@ -289,23 +291,36 @@ void MainController::draw() {
     engine::graphics::OpenGL::enable_depth_testing();
     engine::graphics::OpenGL::clear_buffers();
 
-    draw_meteors();
-    // draw_moon();
-    // draw_space_station();
-    // draw_space_craft();
-    // draw_skybox();
+    // setting mask arg to zero so ref and buff value would be masked to zero
+    m_framebuffer->disable_stencil_writing();
 
+    draw_meteors();
+    draw_space_station();
+    draw_space_craft();
+    draw_skybox();
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     if (platform->get_cursor_status()) {
         draw_gui();
     }
 
+    // writing ones in buffer for all fragments that will be rendered
+    m_framebuffer->stencil_func("always", 1, 0xFF);
+    m_framebuffer->stencil_mask(0xFF);
+
+    draw_moon();
+
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("framebuffer_rectangle");
+    // copying stencil buffer to texture so we can use it in shader
+    m_framebuffer->copy_stencil_to_texture();
+    //activate slot 1 and bind stencil_texture to that slot
+    m_framebuffer->activate_stencil_texture();
     shader->use();
     shader->set_int("screenTexture", 0);
-
+    // using slot 1 for stencilTexture
+    shader->set_int("stencilTexture", 2);
     m_framebuffer->unbind();
+    engine::graphics::OpenGL::disable_depth_testing();
     m_framebuffer->draw_framebuffer_rectangle();
 }
 
@@ -317,8 +332,6 @@ void MainController::end_draw() {
 void MainController::update() {
     update_camera();
 }
-
-
 
 void MainController::update_camera() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();

@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <engine/resources/Shader.hpp>
 
+
 namespace engine::resources {
     class Skybox;
 }
@@ -134,6 +135,7 @@ namespace engine::graphics {
         static void clear_buffers();
 #
 
+
         static unsigned int create_framebuffer();
         static unsigned int create_color_attachment(int SCR_WIDTH, int SCR_HEIGHT);
         static unsigned int create_render_buffer(int SCR_WIDTH, int SCR_HEIGHT);
@@ -144,6 +146,13 @@ namespace engine::graphics {
         static void clear_color(float a, float b, float c, float d);
         static void bind_buffer(unsigned int bufferId);
         static void draw_arrays(int x);
+        static unsigned int copy_stencil_to_texture();
+        static void activate_stencil_texture(unsigned int stencil_texture);
+        static void enable_stencil_testing();
+        static void disable_stencil_writing();
+        static void stencil_func(std::string func, int ref, unsigned int mask);
+        static void stencil_op(std::string sfail, std::string dfail, std::string dpass);
+        static void stencil_mask(int mask);
         /**
         * @brief Retrieve the shader compilation error log message.
         * @param shader_id Shader id for which the compilation failed.

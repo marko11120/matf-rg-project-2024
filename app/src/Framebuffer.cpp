@@ -6,6 +6,7 @@
 #include <../../engine/include/engine/graphics/OpenGL.hpp>
 #include <../../engine/include/engine/platform/PlatformController.hpp>
 
+
 Framebuffer::Framebuffer() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
 
@@ -41,4 +42,27 @@ void Framebuffer::draw_framebuffer_rectangle() {
     engine::graphics::OpenGL::draw_arrays(6);
 }
 
+void Framebuffer::enable_stencil_testing() {
+    engine::graphics::OpenGL::enable_stencil_testing();
+}
+void Framebuffer::disable_stencil_writing() {
+    engine::graphics::OpenGL::disable_stencil_writing();
+}
+
+void Framebuffer::stencil_func(std::string func, int ref, unsigned int mask) {
+    engine::graphics::OpenGL::stencil_func(func, ref, mask);
+}
+void Framebuffer::stencil_op(std::string sfail, std::string dfail, std::string dpass) {
+    engine::graphics::OpenGL::stencil_op(sfail, dfail, dpass);
+}
+void Framebuffer::stencil_mask(int mask) {
+    engine::graphics::OpenGL::stencil_mask(mask);
+}
+
+void Framebuffer::copy_stencil_to_texture() {
+    m_stencil_texture = engine::graphics::OpenGL::copy_stencil_to_texture();
+}
+void Framebuffer::activate_stencil_texture() {
+    engine::graphics::OpenGL::activate_stencil_texture(m_stencil_texture);
+}
 

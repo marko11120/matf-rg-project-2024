@@ -6,12 +6,13 @@
 #include <engine/resources/Skybox.hpp>
 #include <engine/util/Errors.hpp>
 #include <engine/util/Utils.hpp>
+#include <GL/gl.h>
 #include <array>
 #include <filesystem>
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
 
-#include "spdlog/fmt/bundled/color.h"
+
 
 namespace engine::graphics {
     int32_t OpenGL::shader_type_to_opengl_type(resources::ShaderType type) {
@@ -222,6 +223,7 @@ namespace engine::graphics {
 
         return framebuffer;
     }
+
     unsigned int OpenGL::create_color_attachment(int SCR_WIDTH, int SCR_HEIGHT) {
         unsigned int textureColorbuffer;
         CHECKED_GL_CALL(glGenTextures, 1, &textureColorbuffer);
@@ -267,16 +269,10 @@ namespace engine::graphics {
 
 
     unsigned int OpenGL::configure_framebuffer_rectangle() {
-        float vertices[] = {
-            // positions   // texCoords
-            -1.0f,  1.0f,  0.0f, 1.0f,
-            -1.0f, -1.0f,  0.0f, 0.0f,
-             1.0f, -1.0f,  1.0f, 0.0f,
+        float vertices[] = {// positions   // texCoords
+                            -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f,
 
-            -1.0f,  1.0f,  0.0f, 1.0f,
-             1.0f, -1.0f,  1.0f, 0.0f,
-             1.0f,  1.0f,  1.0f, 1.0f
-        };
+                            -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f};
 
         unsigned int vbo;
         unsigned int vao;
@@ -284,13 +280,103 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glGenBuffers, 1, &vbo);
         CHECKED_GL_CALL(glBindVertexArray, vao);
         CHECKED_GL_CALL(glBindBuffer, GL_ARRAY_BUFFER, vbo);
-        CHECKED_GL_CALL(glBufferData, GL_ARRAY_BUFFER, sizeof(float)*24, &vertices, GL_STATIC_DRAW);
+        CHECKED_GL_CALL(glBufferData, GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
         CHECKED_GL_CALL(glEnableVertexAttribArray, 0);
-        CHECKED_GL_CALL(glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+        CHECKED_GL_CALL(glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) 0);
         CHECKED_GL_CALL(glEnableVertexAttribArray, 1);
-        CHECKED_GL_CALL(glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+        CHECKED_GL_CALL(glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                        (void *) (2 * sizeof(float)));
 
         return vao;
     }
+
+    // stencil to texture functions
+    void OpenGL::enable_stencil_testing() {
+        CHECKED_GL_CALL(glEnable, GL_STENCIL_TEST);
+    }
+    void OpenGL::disable_stencil_writing() {
+        CHECKED_GL_CALL(glStencilMask, 0xFF);
+    }
+    void OpenGL::stencil_func(std::string func, int ref, unsigned int mask) {
+        GLenum func_;
+
+        if( "never" == func) func_ = GL_NEVER;
+        else if("less" == func) func_ = GL_LESS;
+        else if("equal" == func) func_ = GL_EQUAL;
+        else if("notequal" == func) func_ = GL_NOTEQUAL;
+        else if("greater" == func) func_ = GL_GREATER;
+        else if ("always" == func) func_ = GL_ALWAYS;
+        else func_ = GL_ALWAYS;
+
+        CHECKED_GL_CALL(glStencilFunc, func_, ref, mask);
+    }
+    void OpenGL::stencil_op(std::string sfail, std::string dfail, std::string dpass) {
+        GLenum sfail_;
+        if("keep" == sfail) sfail_ = GL_KEEP;
+        else if("zero" == sfail) sfail_ = GL_ZERO;
+        else if("replace" == sfail) sfail_ = GL_REPLACE;
+        else if("incr" == sfail) sfail_ = GL_INCR;
+        else if("invert" == sfail) sfail_ = GL_INVERT;
+        else if ("decr" == sfail) sfail_ = GL_DECR;
+
+        GLenum dfail_;
+
+        if("keep" == dfail) dfail_ = GL_KEEP;
+        else if("zero" == dfail) dfail_ = GL_ZERO;
+        else if("replace" == dfail) dfail_ = GL_REPLACE;
+        else if("incr" == dfail) dfail_ = GL_INCR;
+        else if("invert" == dfail) dfail_ = GL_INVERT;
+        else if ("decr" == dfail) dfail_ = GL_DECR;
+
+        GLenum dpass_;
+
+        if("keep" == dpass) dpass_ = GL_KEEP;
+        else if("zero" == dpass) dpass_ = GL_ZERO;
+        else if("replace" == dpass) dpass_ = GL_REPLACE;
+        else if("incr" == dpass) dpass_ = GL_INCR;
+        else if("invert" == dpass) dpass_ = GL_INVERT;
+        else if ("decr" == dpass) dpass_ = GL_DECR;
+
+        CHECKED_GL_CALL(glStencilOp, sfail_, dfail_, dpass_);
+    }
+    void OpenGL::stencil_mask(int mask) {
+        if (mask == 0)
+            CHECKED_GL_CALL(glStencilMask, 0x00);
+        else if (mask == 1)
+            CHECKED_GL_CALL(glStencilMask, 0xFF);
+    }
+
+    unsigned int OpenGL::copy_stencil_to_texture() {
+        auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
+        int width     = platform->window()->width();
+        int height    = platform->window()->height();
+        GLuint stencil_texture;
+        CHECKED_GL_CALL(glGenTextures, 1, &stencil_texture);
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
+        CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
+
+        // vec for storing buff data
+        std::vector<GLubyte> stencilData(width * height);
+
+        // read buff data
+        CHECKED_GL_CALL(glReadPixels, 0, 0, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencilData.data());
+
+
+        // copy to from vec to texture
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
+        CHECKED_GL_CALL(glTexSubImage2D, GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE,
+                        stencilData.data());
+
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        return stencil_texture;
+    }
+    void OpenGL::activate_stencil_texture(unsigned int stencil_texture) {
+        CHECKED_GL_CALL(glActiveTexture, GL_TEXTURE2);
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
+    }
+
+
 
 };
