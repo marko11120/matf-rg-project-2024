@@ -63,16 +63,4 @@ void Framebuffer::copy_stencil_to_texture() {
 void Framebuffer::activate_stencil_texture(int slot) {
     engine::graphics::OpenGL::activate_texture(m_stencil_texture, slot);
 }
-void Framebuffer::bloom_color_buffers() {
-    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-    int width = platform->window()->width();
-    int height = platform->window()->height();
-
-    engine::graphics::OpenGL::bloom_color_buffers(m_color_buffers, width, height);
-}
-
-void Framebuffer::bind_bloom_textures() {
-    engine::graphics::OpenGL::activate_texture(m_color_buffers[0], 0);
-    engine::graphics::OpenGL::activate_texture(m_color_buffers[1], 1);
-}
 

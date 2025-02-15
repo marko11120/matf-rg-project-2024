@@ -16,6 +16,7 @@
 {LEFT} -> {Spacecraft rotate left}
 {RIGHT} -> {Spacecraft rotate right}
 {F12} -> {GUI enable}
+{B} -> {Bloom on/off switch}
 
 ## Features
 
@@ -27,11 +28,11 @@
 
 ### Group A:
 
-[ ] Frame-buffers with post-processing   
+[x] Frame-buffers with post-processing   
 [ ] Instancing  
 [ ] Off-screen Anti-Aliasing  
 [ ] Parallax Mapping
-[ ] Bloom with the use of HDR
+[x] Bloom with the use of HDR
 
 ### Group B:
 

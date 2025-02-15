@@ -5,12 +5,13 @@
 #ifndef BLOOM_H
 #define BLOOM_H
 
-
+#include "Framebuffer.hpp"
 
 class Bloom {
-    static unsigned int screen_color;
-    static unsigned int blur_texture;
-    static void create_color_buffers();
+public:
+    static int bloom;
+    static void bloom_color_buffers(Framebuffer* buff);
+    static void bind_bloom_textures(Framebuffer* fbuff);
 };
 
 

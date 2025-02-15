@@ -1,4 +1,3 @@
-
 #include <engine/graphics/GraphicsController.hpp>
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
@@ -7,11 +6,10 @@
 #include <MainController.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
-#include "spdlog/spdlog.h"
+#include "Bloom.hpp"
 #include "MoonEvent.hpp"
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
-private:
     void on_mouse_move(engine::platform::MousePosition position) override;
     void on_key(engine::platform::Key key) override;
     bool m_first_flick       = true;
@@ -43,7 +41,7 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
         // 0 turning on
         // 1 shutting down
-        main_controller->moon_event = (main_controller->moon_event + 1) % 2;
+        main_controller->moon_event_handler->moon_event = (main_controller->moon_event_handler->moon_event + 1) % 2;
     } else if (platform->key(engine::platform::KeyId::KEY_UP).is_down()) {
         main_controller->spacecraft_pos.y = glm::min(main_controller->spacecraft_pos.y + platform->dt() * 3.f, 30.f);
     } else if (platform->key(engine::platform::KeyId::KEY_DOWN).is_down()) {
@@ -53,7 +51,7 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
     } else if (platform->key(engine::platform::KeyId::KEY_RIGHT).is_down()) {
         main_controller->spacecraft_rotation -= platform->dt() * 1.f;
     } else if (platform->key(engine::platform::KeyId::KEY_B).is_down()) {
-        main_controller->bloom = (main_controller->bloom + 1) % 2;
+        Bloom::bloom = (Bloom::bloom + 1) % 2;
     }
 }
 
@@ -66,12 +64,16 @@ void MainController::initialize() {
     platform->set_cursor_visible(false);
 
     m_framebuffer = new Framebuffer();
+    moon_event_handler = new MoonEvent();
+    Bloom::bloom = 2;
+
     // m_framebuffer->enable_stencil_testing();
     // m_framebuffer->stencil_func("equal", 1, 0XFF);
     // m_framebuffer->stencil_op("zero", "keep", "replace");
 
     m_framebuffer->bind();
-    m_framebuffer->bloom_color_buffers();
+    //m_framebuffer->bloom_color_buffers();
+    Bloom::bloom_color_buffers(m_framebuffer);
 }
 
 bool MainController::loop() {
@@ -132,20 +134,21 @@ void MainController::draw_meteors() {
         glm::vec3(0.0f, -10.0f, -8.0f)
     };
 
-    glm::mat4 model_matrix = glm::mat4(1.0f);
+    glm::mat4 model_matrix;
 
     auto platform                     = engine::core::Controller::get<engine::platform::PlatformController>();
     for(int i = 0; i < 3; i++) {
+        model_matrix = glm::mat4(1.f);
         model_matrix = glm::translate(model_matrix, positions[i]);
-        float timeValue = 2*platform->frame_time().current;
-        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 0.f, 1.f));
+        float timeValue = 3*platform->frame_time().current;
+        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 1.f, 1.f));
         model_matrix = glm::scale(model_matrix, glm::vec3(0.3f));
         shader->set_mat4("model", model_matrix);
         model2->draw(shader);
         model_matrix = glm::mat4(1.f);
         model_matrix = glm::translate(model_matrix, positions[i+3]); // i + 3 for second three positions
-        timeValue = 2*platform->frame_time().current;
-        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 0.f, 1.f));
+        timeValue = 3*platform->frame_time().current;
+        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 1.f, 1.f));
         shader->set_mat4("model", model_matrix);
         model1->draw(shader);
     }
@@ -164,9 +167,9 @@ void MainController::draw_moon() {
 
     float timeValue = platform->frame_time().current;
     // float pom = (cos(timeValue) + 1)/2.f; // fade function
-    if (moon_event == 1) {
+    if (moon_event_handler->moon_event == 1) {
         m_light.intensity = MoonEvent::turn_off();
-    } else if (moon_event == 0) {
+    } else if (moon_event_handler->moon_event == 0) {
         m_light.intensity = MoonEvent::turn_on();
     }
 
@@ -313,23 +316,26 @@ void MainController::draw() {
     // writing ones in buffer for all fragments that will be rendered
     //m_framebuffer->stencil_func("always", 1, 0xFF);
     //m_framebuffer->stencil_mask(0xFF);
+
     m_framebuffer->unbind();
-    m_framebuffer->bind_bloom_textures();
+    Bloom::bind_bloom_textures(m_framebuffer);
 
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
-    auto shader = resources->shader("framebuffer_rectangle");
+    auto shader = resources->shader("bloom_shader");
+
     // copying stencil buffer to texture so we can use it in shader
     //m_framebuffer->copy_stencil_to_texture();
     //activate slot 1 and bind stencil_texture to that slot
     //m_framebuffer->activate_stencil_texture(1);
+
     shader->use();
-    shader->set_int("bloomSwitch", bloom);
+    shader->set_int("bloomSwitch", Bloom::bloom);
     shader->set_int("screenTexture", 0);
     shader->set_int("bloomTexture", 1);
+    shader->set_float("exposure", exposure);
 
     // using slot 1 for stencilTexture
     //shader->set_int("stencilTexture", 1);
-
 
     m_framebuffer->draw_framebuffer_rectangle();
 }

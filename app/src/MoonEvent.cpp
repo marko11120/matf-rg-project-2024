@@ -5,10 +5,13 @@
 #include "MoonEvent.hpp"
 #include "glm/vec3.hpp"
 
+ MoonEvent::MoonEvent() {
+    moon_event = 2;
+}
 glm::vec3 MoonEvent::turn_off() {
     return glm::vec3(0.2);
 }
-
 glm::vec3 MoonEvent::turn_on() {
     return glm::vec3(1.5f);
 }
+

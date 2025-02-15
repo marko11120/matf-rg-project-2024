@@ -27,8 +27,8 @@ struct SpotLight {
 class MainController : public engine::core::Controller {
     friend class MoonEvent;
 public:
-    int moon_event = 2;
-    int bloom = 1;
+    MoonEvent* moon_event_handler;
+    float exposure = 1;
     glm::vec3 spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float spacecraft_rotation = glm::radians(0.f);
 private:

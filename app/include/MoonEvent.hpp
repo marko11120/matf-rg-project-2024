@@ -8,8 +8,10 @@
 
 class MoonEvent {
 public:
+    MoonEvent();
     static glm::vec3 turn_on();
     static glm::vec3 turn_off();
+    int moon_event;
 };
 
 

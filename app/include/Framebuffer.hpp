@@ -7,6 +7,7 @@
 #include <string>
 
 class Framebuffer {
+    friend class Bloom;
 public:
     Framebuffer();
     void bind();
@@ -19,8 +20,7 @@ public:
     static void stencil_func(std::string func, int ref, unsigned int mask);
     static void stencil_op(std::string sfail, std::string dfail, std::string dpass);
     static void stencil_mask(int mask);
-    void bloom_color_buffers();
-    void bind_bloom_textures();
+
 private:
     unsigned int m_vao, m_rbo, m_framebuffer, m_texture_colorbuffer, m_stencil_texture;
     unsigned int m_color_buffers[2];
