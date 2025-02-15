@@ -6,14 +6,22 @@
 #define MOONEVENT_H
 #include "glm/vec3.hpp"
 
+enum MoonState { OFF, FADING_IN, ON, FADING_OUT };
+
+
+
 class MoonEvent {
 public:
     MoonEvent();
-    glm::vec3 turn_on();
-    glm::vec3 turn_off();
-    int moon_event;
+    void update_moon(float delta_time);
+    bool event_active;
 private:
-    bool m_pass;
+    MoonState m_moon_state;
+    float m_brightness;
+    float m_fade_speed; // Brzina fade efekta
+    bool m_e_pressed = false;
+    bool m_should_turn_on = true;
+    bool should_switch();
 };
 
 

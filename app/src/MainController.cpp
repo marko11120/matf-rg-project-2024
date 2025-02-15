@@ -39,9 +39,9 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
         m_cursor_visibility = !m_cursor_visibility;
         platform->set_cursor_visible(m_cursor_visibility);
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
-        // 0 turning on
-        // 1 shutting down
-        main_controller->m_moon_event_handler->moon_event = (main_controller->m_moon_event_handler->moon_event + 1) % 2;
+        // if action is not active, then activate it
+        if(main_controller->m_moon_event_handler->event_active == false)
+            main_controller->m_moon_event_handler->event_active = !main_controller->m_moon_event_handler->event_active;
     } else if (platform->key(engine::platform::KeyId::KEY_UP).is_down()) {
         main_controller->m_spacecraft_pos.y = glm::min(main_controller->m_spacecraft_pos.y + platform->dt() * 3.f, 30.f);
     } else if (platform->key(engine::platform::KeyId::KEY_DOWN).is_down()) {
@@ -165,13 +165,8 @@ void MainController::draw_moon() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
 
-    float time_value = platform->frame_time().current;
-    //float pom = (cos(time_value) + 1)/2.f; // fade function
-    if (m_moon_event_handler->moon_event == 1) {
-        m_light.intensity = m_moon_event_handler->turn_off();
-    } else if (m_moon_event_handler->moon_event == 0) {
-        m_light.intensity = m_moon_event_handler->turn_on();
-    }
+    float time_value = 2*platform->frame_time().current;
+    m_moon_event_handler->update_moon(platform->dt());
 
     shader->set_vec3("light_intensity", m_light.intensity);
     glm::mat4 model_matrix = glm::mat4(1.0f);

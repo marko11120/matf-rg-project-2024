@@ -29,6 +29,7 @@ struct SpotLight {
 
 class MainController : public engine::core::Controller {
     friend class MainPlatformEventObserver;
+    friend class MoonEvent;
     bool loop() override;
     void initialize() override;
     void begin_draw() override;

@@ -3,7 +3,6 @@
 #include <engine/platform/PlatformController.hpp>
 #include <engine/resources/Shader.hpp>
 #include <engine/resources/ShaderCompiler.hpp>
-#include <engine/resources/Skybox.hpp>
 #include <engine/util/Errors.hpp>
 #include <engine/util/Utils.hpp>
 #include <spdlog/spdlog.h>
@@ -175,10 +174,7 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glClear, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
-    void OpenGL::blend() {
-        CHECKED_GL_CALL(glEnable, GL_BLEND);
-        CHECKED_GL_CALL(glBlendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
+
     void OpenGL::clear_color(float a, float b, float c, float d) {
         CHECKED_GL_CALL(glClearColor, a, b, c, d);
         CHECKED_GL_CALL(glClear, GL_COLOR_BUFFER_BIT);
@@ -265,7 +261,8 @@ namespace engine::graphics {
         float vertices[] = {// positions   // texCoords
             -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f,
 
-            -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f};
+            -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f
+        };
 
         unsigned int vbo;
         unsigned int vao;

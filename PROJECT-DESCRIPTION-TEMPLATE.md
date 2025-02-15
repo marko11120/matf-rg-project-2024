@@ -24,7 +24,7 @@
 
 [x] Model with lighting
 [x] Two types of lighting with customizable colors and movement through GUI or ACTIONS
-[ ] {ACTION_X} --- AFTER_M_SECONDS---Triggers---> {EVENT_A} ---> AFTER_N_SECONDS---Triggers---> {EVENT_B}
+[] {ACTION_X} --- AFTER_M_SECONDS---Triggers---> {EVENT_A} ---> AFTER_N_SECONDS---Triggers---> {EVENT_B}
 
 ### Group A:
 
@@ -32,22 +32,20 @@
 [ ] Instancing  
 [ ] Off-screen Anti-Aliasing  
 [ ] Parallax Mapping
-[x] Bloom with the use of HDR
 
 ### Group B:
 
+[x] Bloom with the use of HDR
 [ ] Deferred Shading  
 [ ] Point Shadows  
 [ ] SSAO
 
 ### Engine improvement:
 
-[ ] ...
+[ ]  
 
 ## Models:
-
-[link1]   
-[link2]
+[https://drive.google.com/drive/folders/1g7tulu0S9fIwor31Qgwyl0m8sWO1cCXX?usp=sharing]
 
 ## Textures
 

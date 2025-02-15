@@ -141,25 +141,93 @@ namespace engine::graphics {
         static void clear_buffers();
 #
 
-
+        /**
+        * @brief creates and bind framebuffer
+        */
         static unsigned int create_framebuffer();
+
+        /**
+        * @brief creates color attachment and returns its id
+        */
         static unsigned int create_color_attachment(int scr_width, int scr_height);
+
+        /**
+        * @brief creates render buffer and returns its id
+        */
         static unsigned int create_render_buffer(int scr_width, int scr_height);
+
+        /**
+        * @brief sends rectangle data on GPU for drawing
+        */
         static unsigned int configure_framebuffer_rectangle();
+        /**
+        * @brief binds frame buffer
+        */
         static void bind_framebuffer(unsigned int framebuffer);
-        static void blend();
+
+        /**
+        * @brief set state color to (r, g, b, a) and clears color buffer
+        */
         static void clear_color(float r, float g, float b, float a);
+
+        /**
+        * @brief binds vertex array
+        */
         static void bind_buffer(unsigned int buffer_id);
+
+        /**
+        * @brief specify to openGL how vertex should use for drawing
+        */
         static void draw_arrays(int vertex_count);
+
+        /**
+        * @brief copies data from stencil buffer to texture with id stencil_texture
+        */
         static void copy_stencil_to_texture(int width, int height, unsigned int stencil_texture);
+
+        /**
+        * @brief creates texture
+        */
         static unsigned int create_texture(int width, int height);
+
+        /**
+        * @brief activate texture slot and binds texture
+        */
         static void activate_texture(unsigned int texture, int slot);
+
+        /**
+        * @brief enables stencil testing
+        */
         static void enable_stencil_testing();
+
+        /**
+        * @brief disable writing into stencil buffer
+        */
         static void disable_stencil_writing();
+
+        /**
+        * @brief determines the way of writing in stencil buff
+        */
         static void stencil_func(Flags func, int ref, unsigned int mask);
+
+        /**
+        * @brief actions if stenctil test fails, stencil pass and depth fails, both pass
+        */
         static void stencil_op(Flags sfail, Flags dfail, Flags dpass);
+
+        /**
+        * @brief sets stencil mask to mask
+        */
         static void stencil_mask(int mask);
+
+        /**
+        * @brief creates hdr texture and attaches it to color attachment number attachment_number
+        */
         static unsigned int create_color_buffer(int scr_width, int scr_height, int attachment_number);
+
+        /**
+        * @brief MRT(multiple render targets) for number_of_attachments color attachments
+        */
         static void draw_mrt(int number_of_attachments);
         /**
         * @brief Retrieve the shader compilation error log message.
