@@ -20,4 +20,4 @@ void Bloom::bind_bloom_textures(Framebuffer* fbuff) {
     engine::graphics::OpenGL::activate_texture(fbuff->m_color_buffers[1], 1);
 }
 
-int Bloom::bloom = 2;
+bool Bloom::bloom = true;

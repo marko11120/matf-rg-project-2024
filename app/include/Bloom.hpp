@@ -9,7 +9,7 @@
 
 class Bloom {
 public:
-    static int bloom;
+    static bool bloom;
     static void bloom_color_buffers(Framebuffer* buff);
     static void bind_bloom_textures(Framebuffer* fbuff);
 };

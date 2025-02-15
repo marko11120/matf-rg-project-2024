@@ -51,7 +51,7 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
     } else if (platform->key(engine::platform::KeyId::KEY_RIGHT).is_down()) {
         main_controller->spacecraft_rotation -= platform->dt() * 1.f;
     } else if (platform->key(engine::platform::KeyId::KEY_B).is_down()) {
-        Bloom::bloom = (Bloom::bloom + 1) % 2;
+        Bloom::bloom = !Bloom::bloom;
     }
 }
 
@@ -65,14 +65,13 @@ void MainController::initialize() {
 
     m_framebuffer = new Framebuffer();
     moon_event_handler = new MoonEvent();
-    Bloom::bloom = 2;
+    Bloom::bloom = true;
 
     // m_framebuffer->enable_stencil_testing();
     // m_framebuffer->stencil_func("equal", 1, 0XFF);
     // m_framebuffer->stencil_op("zero", "keep", "replace");
 
     m_framebuffer->bind();
-    //m_framebuffer->bloom_color_buffers();
     Bloom::bloom_color_buffers(m_framebuffer);
 }
 
@@ -140,15 +139,15 @@ void MainController::draw_meteors() {
     for(int i = 0; i < 3; i++) {
         model_matrix = glm::mat4(1.f);
         model_matrix = glm::translate(model_matrix, positions[i]);
-        float timeValue = 3*platform->frame_time().current;
-        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 1.f, 1.f));
+        float time_value = 3*platform->frame_time().current;
+        model_matrix = glm::rotate(model_matrix, glm::radians(time_value), glm::vec3(1.f, 1.f, 1.f));
         model_matrix = glm::scale(model_matrix, glm::vec3(0.3f));
         shader->set_mat4("model", model_matrix);
         model2->draw(shader);
         model_matrix = glm::mat4(1.f);
         model_matrix = glm::translate(model_matrix, positions[i+3]); // i + 3 for second three positions
-        timeValue = 3*platform->frame_time().current;
-        model_matrix = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.f, 1.f, 1.f));
+        time_value = 3*platform->frame_time().current;
+        model_matrix = glm::rotate(model_matrix, glm::radians(time_value), glm::vec3(1.f, 1.f, 1.f));
         shader->set_mat4("model", model_matrix);
         model1->draw(shader);
     }
@@ -165,18 +164,18 @@ void MainController::draw_moon() {
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
 
-    float timeValue = platform->frame_time().current;
-    // float pom = (cos(timeValue) + 1)/2.f; // fade function
+    float time_value = platform->frame_time().current;
+    //float pom = (cos(time_value) + 1)/2.f; // fade function
     if (moon_event_handler->moon_event == 1) {
-        m_light.intensity = MoonEvent::turn_off();
+        m_light.intensity = moon_event_handler->turn_off();
     } else if (moon_event_handler->moon_event == 0) {
-        m_light.intensity = MoonEvent::turn_on();
+        m_light.intensity = moon_event_handler->turn_on();
     }
 
     shader->set_vec3("light_intensity", m_light.intensity);
     glm::mat4 model_matrix = glm::mat4(1.0f);
     model_matrix           = glm::translate(model_matrix, m_light.position);
-    model_matrix           = glm::rotate(model_matrix, glm::radians(timeValue), glm::vec3(1.0f, 1.0f, 0.0f));
+    model_matrix           = glm::rotate(model_matrix, glm::radians(time_value), glm::vec3(1.0f, 1.0f, 0.0f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.6f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);
@@ -329,7 +328,7 @@ void MainController::draw() {
     //m_framebuffer->activate_stencil_texture(1);
 
     shader->use();
-    shader->set_int("bloomSwitch", Bloom::bloom);
+    shader->set_int("bloomSwitch", (Bloom::bloom ? 1 : 0));
     shader->set_int("screenTexture", 0);
     shader->set_int("bloomTexture", 1);
     shader->set_float("exposure", exposure);

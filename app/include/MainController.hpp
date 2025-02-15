@@ -10,7 +10,7 @@
 #include "MoonEvent.hpp"
 
 struct Light{
-    glm::vec3 intensity = glm::vec3(1.5f);
+    glm::vec3 intensity = glm::vec3(1.4f);
     glm::vec3 position = glm::vec3(15.f, 30.f, -20.f);
     glm::vec3 ambient = glm::vec3(0.8f);
     glm::vec3 diffuse = glm::vec3(1.0f);
@@ -26,6 +26,7 @@ struct SpotLight {
 
 class MainController : public engine::core::Controller {
     friend class MoonEvent;
+    friend class MainPlatformEventObserver;
 public:
     MoonEvent* moon_event_handler;
     float exposure = 1;
