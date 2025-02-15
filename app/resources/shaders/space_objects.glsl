@@ -1,21 +1,22 @@
 //#shader vertex
 #version 330 core
-
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 
-out vec2 TexCoords;
-out vec3 Normal;
 out vec3 FragPos;
+out vec3 Normal;
+out vec2 TexCoords;
 
-uniform mat4 model, view, projection;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main(){
-    FragPos = vec3(model * vec4(aPos, 1.0));
+    FragPos = vec3(model * vec4(aPos, 1.0f));
+    gl_Position = projection * view * model * vec4(aPos, 1.0f);
     TexCoords = aTexCoords;
     Normal = mat3(transpose(inverse(model))) * aNormal;
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
 }
 
 //#shader fragment
@@ -23,9 +24,9 @@ void main(){
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BrightColor;
 
-in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
+in vec2 TexCoords;
 
 struct PointLight{
     vec3 ambient;
@@ -45,7 +46,6 @@ struct SpotLight{
     vec3 direction;
     float cut_off;
     float outerCut_off;
-
     float linearC;
     float quadraticC;
     float shininess;
@@ -54,8 +54,8 @@ struct SpotLight{
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_specular0;
 
-uniform SpotLight spotLight;
 uniform PointLight pointLight;
+uniform SpotLight spotLight;
 uniform vec3 cameraPos;
 
 vec3 pointLightCalc(PointLight pointLight, vec3 FragPos, vec3 Normal, vec3 CameraPos, sampler2D texture_diffuse0, sampler2D texture_specular0){
@@ -71,7 +71,7 @@ vec3 pointLightCalc(PointLight pointLight, vec3 FragPos, vec3 Normal, vec3 Camer
     vec3 diffuse = pointLight.intensity * pointLight.diffuse * texture(texture_diffuse0, TexCoords).rgb * diff;
     diffuse *= attenuation;
 
-    float specularStrength = 0.8f;
+    float specularStrength = 0.8;
     vec3 v = normalize(reflect(-pointLightDir, normalize(Normal)));
     vec3 viewDir = normalize(cameraPos - FragPos);
     float spec = pow(max(dot(viewDir, v), 0.0), pointLight.shininess);
@@ -117,12 +117,12 @@ void main(){
 
     vec3 spot = spotLightCalc(spotLight, FragPos, Normal, cameraPos, texture_diffuse0, texture_specular0);
     vec3 point = pointLightCalc(pointLight, FragPos, Normal, cameraPos, texture_diffuse0, texture_specular0);
-
     vec3 result = spot + point;
+
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
-        if(brightness > 1.0)
-            BrightColor = vec4(result, 1.0);
-        else
-            BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+    if(brightness >= 1.2)
+        BrightColor = vec4(result, 1.0);
+    else
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
     FragColor = vec4(result, 1.0);
 }
