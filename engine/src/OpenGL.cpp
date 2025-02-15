@@ -6,12 +6,8 @@
 #include <engine/resources/Skybox.hpp>
 #include <engine/util/Errors.hpp>
 #include <engine/util/Utils.hpp>
-#include <GL/gl.h>
-#include <array>
-#include <filesystem>
 #include <spdlog/spdlog.h>
 #include <stb_image.h>
-
 
 
 namespace engine::graphics {
@@ -68,7 +64,7 @@ namespace engine::graphics {
         }
         float vertices[] = {
             // formatter: off
-            #include <skybox_vertices.include>
+#include <skybox_vertices.include>
             // formatter: on
         };
         uint32_t skybox_vbo = 0;
@@ -224,22 +220,22 @@ namespace engine::graphics {
         return framebuffer;
     }
 
-    unsigned int OpenGL::create_color_attachment(int SCR_WIDTH, int SCR_HEIGHT) {
+    unsigned int OpenGL::create_color_attachment(int scr_width, int scr_height) {
         unsigned int textureColorbuffer;
         CHECKED_GL_CALL(glGenTextures, 1, &textureColorbuffer);
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, textureColorbuffer);
-        CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGB, scr_width, scr_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
 
         return textureColorbuffer;
     }
-    unsigned int OpenGL::create_render_buffer(int SCR_WIDTH, int SCR_HEIGHT) {
+    unsigned int OpenGL::create_render_buffer(int scr_width, int scr_height) {
         unsigned int rbo;
         CHECKED_GL_CALL(glGenRenderbuffers, 1, &rbo);
         CHECKED_GL_CALL(glBindRenderbuffer, GL_RENDERBUFFER, rbo);
-        CHECKED_GL_CALL(glRenderbufferStorage, GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+        CHECKED_GL_CALL(glRenderbufferStorage, GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, scr_width, scr_height);
         CHECKED_GL_CALL(glFramebufferRenderbuffer, GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -255,24 +251,21 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glBindFramebuffer, GL_FRAMEBUFFER, framebuffer);
     }
 
-    void OpenGL::bind_colorbuffer(unsigned int colorbuffer) {
-        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, colorbuffer);
-    }
 
     void OpenGL::bind_buffer(unsigned int bufferId) {
         CHECKED_GL_CALL(glBindVertexArray, bufferId);
     }
 
-    void OpenGL::draw_arrays(int x) {
-        CHECKED_GL_CALL(glDrawArrays, GL_TRIANGLES, 0, x);
+    void OpenGL::draw_arrays(int vertex_count) {
+        CHECKED_GL_CALL(glDrawArrays, GL_TRIANGLES, 0, vertex_count);
     }
 
 
     unsigned int OpenGL::configure_framebuffer_rectangle() {
         float vertices[] = {// positions   // texCoords
-                            -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f,
 
-                            -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f};
+            -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f};
 
         unsigned int vbo;
         unsigned int vao;
@@ -297,45 +290,56 @@ namespace engine::graphics {
     void OpenGL::disable_stencil_writing() {
         CHECKED_GL_CALL(glStencilMask, 0x00);
     }
-    void OpenGL::stencil_func(std::string func, int ref, unsigned int mask) {
+    void OpenGL::stencil_func(Flags func, int ref, unsigned int mask) {
         GLenum func_;
 
-        if( "never" == func) func_ = GL_NEVER;
-        else if("less" == func) func_ = GL_LESS;
-        else if("equal" == func) func_ = GL_EQUAL;
-        else if("notequal" == func) func_ = GL_NOTEQUAL;
-        else if("greater" == func) func_ = GL_GREATER;
-        else if ("always" == func) func_ = GL_ALWAYS;
-        else func_ = GL_ALWAYS;
+        switch (func) {
+            case NEVER: func_ = GL_NEVER; break;
+            case LESS: func_ = GL_LESS; break;
+            case EQUAL: func_ = GL_EQUAL; break;
+            case NOTEQUAL: func_ = GL_NOTEQUAL; break;
+            case GREATER: func_ = GL_GREATER; break;
+            case ALWAYS: func_ = GL_ALWAYS; break;
+        default: func_ = GL_NEVER; break;
+        }
 
         CHECKED_GL_CALL(glStencilFunc, func_, ref, mask);
     }
-    void OpenGL::stencil_op(std::string sfail, std::string dfail, std::string dpass) {
+    void OpenGL::stencil_op(Flags sfail, Flags dfail, Flags dpass) {
         GLenum sfail_;
-        if("keep" == sfail) sfail_ = GL_KEEP;
-        else if("zero" == sfail) sfail_ = GL_ZERO;
-        else if("replace" == sfail) sfail_ = GL_REPLACE;
-        else if("incr" == sfail) sfail_ = GL_INCR;
-        else if("invert" == sfail) sfail_ = GL_INVERT;
-        else if ("decr" == sfail) sfail_ = GL_DECR;
+
+        switch (sfail) {
+            case KEEP: sfail_ = GL_KEEP; break;
+            case ZERO: sfail_ = GL_ZERO; break;
+            case REPLACE: sfail_ = GL_REPLACE; break;
+            case INCR: sfail_ = GL_INCR; break;
+            case DECR: sfail_ = GL_DECR; break;
+            case INVERT: sfail_ = GL_INVERT; break;
+        default: sfail_ = GL_KEEP; break;
+        }
 
         GLenum dfail_;
 
-        if("keep" == dfail) dfail_ = GL_KEEP;
-        else if("zero" == dfail) dfail_ = GL_ZERO;
-        else if("replace" == dfail) dfail_ = GL_REPLACE;
-        else if("incr" == dfail) dfail_ = GL_INCR;
-        else if("invert" == dfail) dfail_ = GL_INVERT;
-        else if ("decr" == dfail) dfail_ = GL_DECR;
-
+        switch (dfail) {
+            case KEEP: dfail_ = GL_KEEP; break;
+            case ZERO: dfail_ = GL_ZERO; break;
+            case REPLACE: dfail_ = GL_REPLACE; break;
+            case INCR: dfail_ = GL_INCR; break;
+            case DECR: dfail_ = GL_DECR; break;
+            case INVERT: dfail_ = GL_INVERT; break;
+            default: sfail_ = GL_KEEP; break;
+        }
         GLenum dpass_;
 
-        if("keep" == dpass) dpass_ = GL_KEEP;
-        else if("zero" == dpass) dpass_ = GL_ZERO;
-        else if("replace" == dpass) dpass_ = GL_REPLACE;
-        else if("incr" == dpass) dpass_ = GL_INCR;
-        else if("invert" == dpass) dpass_ = GL_INVERT;
-        else if ("decr" == dpass) dpass_ = GL_DECR;
+        switch (dpass) {
+            case KEEP: dpass_ = GL_KEEP; break;
+            case ZERO: dpass_ = GL_ZERO; break;
+            case REPLACE: dpass_ = GL_REPLACE; break;
+            case INCR: dpass_ = GL_INCR; break;
+            case DECR: dpass_ = GL_DECR; break;
+            case INVERT: dpass_ = GL_INVERT; break;
+        default: dpass_ = GL_KEEP; break;
+        }
 
         CHECKED_GL_CALL(glStencilOp, sfail_, dfail_, dpass_);
     }
@@ -346,56 +350,56 @@ namespace engine::graphics {
             CHECKED_GL_CALL(glStencilMask, 0xFF);
     }
 
-    unsigned int OpenGL::copy_stencil_to_texture() {
-        auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-        int width     = platform->window()->width();
-        int height    = platform->window()->height();
-        unsigned int stencil_texture;
-        CHECKED_GL_CALL(glGenTextures, 1, &stencil_texture);
+    void OpenGL::copy_stencil_to_texture(int width, int height, unsigned int stencil_texture) {
+
+
+        // copy to texture from stencil buff
+        GLubyte* stencil_data = new GLubyte[width * height];
+
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
-        CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_R8, width, height, 0, GL_RED, GL_UNSIGNED_BYTE, nullptr);
-
-        // vec for storing buff data
-        std::vector<GLubyte> stencilData(width * height);
-
-        // read buff data
-        CHECKED_GL_CALL(glReadPixels, 0, 0, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencilData.data());
-
-
-        // copy to from vec to texture
-        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
-        CHECKED_GL_CALL(glTexSubImage2D, GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE,
-                        stencilData.data());
+        CHECKED_GL_CALL(glTexSubImage2D, GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, (const void*)stencil_data);
 
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        return stencil_texture;
     }
     void OpenGL::activate_texture(unsigned int texture, int slot) {
         CHECKED_GL_CALL(glActiveTexture, GL_TEXTURE0 + slot);
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, texture);
     }
 
-    void OpenGL::bloom_color_buffers(unsigned int buffers[], int SCR_WIDTH, int SCR_HEIGHT) {
-        unsigned int colorBuffers[2];
-        CHECKED_GL_CALL(glGenTextures, 2, colorBuffers);
-        for (unsigned int i = 0; i < 2; i++)
-        {
-            CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, colorBuffers[i]);
-            CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, nullptr);
-            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
-            CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            // attach texture to framebuffer
-            CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, colorBuffers[i], 0);
-        }
+    unsigned int OpenGL::create_color_buffer(int scr_width, int scr_height, int attachment_number) {
+        unsigned int color_buffer;
+        CHECKED_GL_CALL(glGenTextures, 1, &color_buffer);
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, color_buffer);
+        CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA16F, scr_width, scr_height, 0, GL_RGBA, GL_FLOAT, nullptr);
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        // attach texture to framebuffer
+        CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachment_number, GL_TEXTURE_2D, color_buffer, 0);
 
-        unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-        CHECKED_GL_CALL(glDrawBuffers, 2, attachments);
-
-        buffers[0] = colorBuffers[0];
-        buffers[1] = colorBuffers[1];
+        return color_buffer;
     }
-};
+
+
+    unsigned int OpenGL::create_texture(int width, int height) {
+        unsigned int texture;
+        CHECKED_GL_CALL(glGenTextures, 1, &texture);
+
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, texture);
+        CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+
+        return texture;
+    }
+
+    void OpenGL::draw_mrt(int number_of_attachments) {
+        unsigned int attachments[number_of_attachments];
+        for(int i = 0; i < number_of_attachments; i++) {
+            attachments[i] = GL_COLOR_ATTACHMENT0 + i;
+        }
+        CHECKED_GL_CALL(glDrawBuffers, 2, attachments);
+    }
+
+}
+

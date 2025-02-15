@@ -2,12 +2,12 @@
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
 #include <engine/resources/ResourcesController.hpp>
-#include <Framebuffer.hpp>
 #include <MainController.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui.h>
-#include "Bloom.hpp"
 #include "MoonEvent.hpp"
+#include "engine/graphics/Bloom.hpp"
+
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
     void on_mouse_move(engine::platform::MousePosition position) override;
@@ -41,17 +41,17 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
     } else if (platform->key(engine::platform::KeyId::KEY_E).is_down()) {
         // 0 turning on
         // 1 shutting down
-        main_controller->moon_event_handler->moon_event = (main_controller->moon_event_handler->moon_event + 1) % 2;
+        main_controller->m_moon_event_handler->moon_event = (main_controller->m_moon_event_handler->moon_event + 1) % 2;
     } else if (platform->key(engine::platform::KeyId::KEY_UP).is_down()) {
-        main_controller->spacecraft_pos.y = glm::min(main_controller->spacecraft_pos.y + platform->dt() * 3.f, 30.f);
+        main_controller->m_spacecraft_pos.y = glm::min(main_controller->m_spacecraft_pos.y + platform->dt() * 3.f, 30.f);
     } else if (platform->key(engine::platform::KeyId::KEY_DOWN).is_down()) {
-        main_controller->spacecraft_pos.y = glm::max(main_controller->spacecraft_pos.y - platform->dt() * 3.f, -2.f);
+        main_controller->m_spacecraft_pos.y = glm::max(main_controller->m_spacecraft_pos.y - platform->dt() * 3.f, -2.f);
     } else if (platform->key(engine::platform::KeyId::KEY_LEFT).is_down()) {
-        main_controller->spacecraft_rotation += platform->dt() * 1.f;
+        main_controller->m_spacecraft_rotation += platform->dt() * 1.f;
     } else if (platform->key(engine::platform::KeyId::KEY_RIGHT).is_down()) {
-        main_controller->spacecraft_rotation -= platform->dt() * 1.f;
+        main_controller->m_spacecraft_rotation -= platform->dt() * 1.f;
     } else if (platform->key(engine::platform::KeyId::KEY_B).is_down()) {
-        Bloom::bloom = !Bloom::bloom;
+        engine::graphics::Bloom::bloom = !engine::graphics::Bloom::bloom;
     }
 }
 
@@ -63,16 +63,16 @@ void MainController::initialize() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     platform->set_cursor_visible(false);
 
-    m_framebuffer = new Framebuffer();
-    moon_event_handler = new MoonEvent();
-    Bloom::bloom = true;
+    m_framebuffer = new engine::graphics::Framebuffer();
+    m_moon_event_handler           = new MoonEvent();
+    engine::graphics::Bloom::bloom = true;
 
     // m_framebuffer->enable_stencil_testing();
     // m_framebuffer->stencil_func("equal", 1, 0XFF);
     // m_framebuffer->stencil_op("zero", "keep", "replace");
 
     m_framebuffer->bind();
-    Bloom::bloom_color_buffers(m_framebuffer);
+    engine::graphics::Bloom::bloom_color_buffers(m_framebuffer);
 }
 
 bool MainController::loop() {
@@ -107,22 +107,23 @@ void MainController::draw_meteors() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     shader->set_vec3("cameraPos", graphics->camera()->Position);
 
-    shader->set_vec3("light.ambient", m_light.ambient);
-    shader->set_vec3("light.diffuse", m_light.diffuse);
-    shader->set_vec3("light.specular", m_light.specular);
-    shader->set_vec3("light.position", m_light.position);
-    shader->set_vec3("light.intensity", m_light.intensity);
+    shader->set_vec3("pointLight.ambient", m_light.ambient);
+    shader->set_vec3("pointLight.diffuse", m_light.diffuse);
+    shader->set_vec3("pointLight.specular", m_light.specular);
+    shader->set_vec3("pointLight.position", m_light.position);
+    shader->set_vec3("pointLight.intensity", m_light.intensity);
+    shader->set_float("pointLight.linearC", 0.003f);
+    shader->set_float("pointLight.quadraticC", 0.0001f);
+    shader->set_float("pointLight.shininess", 32.f);
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
     shader->set_float("spotLight.cut_off", m_spot_light.cut_off);
     shader->set_float("spotLight.outerCut_off", m_spot_light.outterCut_off);
     shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
     shader->set_vec3("spotLight.specular", m_spot_light.specular);
-
-    shader->set_float("material.linearC", 0.003f);
-    shader->set_float("material.quadraticC", 0.0001f);
-    shader->set_float("material.shininess", 32.f);
-
+    shader->set_float("spotLight.linearC", 0.003f);
+    shader->set_float("spotLight.quadraticC", 0.0001f);
+    shader->set_float("spotLight.shininess", 32.f);
 
     static glm::vec3 positions [] = {
         glm::vec3(-29.0f,  -17.0f, -28.0f), // first three positiions are for bigger meteor
@@ -166,10 +167,10 @@ void MainController::draw_moon() {
 
     float time_value = platform->frame_time().current;
     //float pom = (cos(time_value) + 1)/2.f; // fade function
-    if (moon_event_handler->moon_event == 1) {
-        m_light.intensity = moon_event_handler->turn_off();
-    } else if (moon_event_handler->moon_event == 0) {
-        m_light.intensity = moon_event_handler->turn_on();
+    if (m_moon_event_handler->moon_event == 1) {
+        m_light.intensity = m_moon_event_handler->turn_off();
+    } else if (m_moon_event_handler->moon_event == 0) {
+        m_light.intensity = m_moon_event_handler->turn_on();
     }
 
     shader->set_vec3("light_intensity", m_light.intensity);
@@ -185,24 +186,27 @@ void MainController::draw_space_station() {
     auto resources                    = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto graphics                     = engine::core::Controller::get<engine::graphics::GraphicsController>();
     engine::resources::Model *model   = resources->model("space_station");
-    engine::resources::Shader *shader = resources->shader("space_station");
+    engine::resources::Shader *shader = resources->shader("space_objects");
 
     shader->use();
-    shader->set_vec3("light.ambient", m_light.ambient);
-    shader->set_vec3("light.diffuse", m_light.diffuse);
-    shader->set_vec3("light.specular", m_light.specular);
-    shader->set_vec3("light.position", m_light.position);
-    shader->set_vec3("light.intensity", m_light.intensity);
+    shader->set_vec3("pointLight.ambient", m_light.ambient);
+    shader->set_vec3("pointLight.diffuse", m_light.diffuse);
+    shader->set_vec3("pointLight.specular", m_light.specular);
+    shader->set_vec3("pointLight.position", m_light.position);
+    shader->set_vec3("pointLight.intensity", m_light.intensity);
+    shader->set_float("pointLight.linearC", 0.003f);
+    shader->set_float("pointLight.quadraticC", 0.0001f);
+    shader->set_float("pointLight.shininess", 32.f);
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
     shader->set_float("spotLight.cut_off", m_spot_light.cut_off);
     shader->set_float("spotLight.outerCut_off", m_spot_light.outterCut_off);
     shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
     shader->set_vec3("spotLight.specular", m_spot_light.specular);
+    shader->set_float("spotLight.linearC", 0.003f);
+    shader->set_float("spotLight.quadraticC", 0.0001f);
+    shader->set_float("spotLight.shininess", 32.f);
 
-    shader->set_float("material.linearC", 0.003f);
-    shader->set_float("material.quadraticC", 0.0001f);
-    shader->set_float("material.shininess", 32.f);
 
     shader->set_vec3("cameraPos", graphics->camera()->Position);
 
@@ -219,18 +223,17 @@ void MainController::draw_space_craft() {
     auto resources                    = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto graphics                     = engine::core::Controller::get<engine::graphics::GraphicsController>();
     engine::resources::Model *model   = resources->model("spacecraft2");
-    engine::resources::Shader *shader = resources->shader("space_craft");
+    engine::resources::Shader *shader = resources->shader("space_objects");
 
     shader->use();
-    shader->set_vec3("light.ambient", m_light.ambient);
-    shader->set_vec3("light.diffuse", m_light.diffuse);
-    shader->set_vec3("light.specular", m_light.specular);
-    shader->set_vec3("light.position", m_light.position);
-    shader->set_vec3("light.intensity", m_light.intensity);
-
-    shader->set_float("material.linearC", 0.003f);
-    shader->set_float("material.quadraticC", 0.0001f);
-    shader->set_float("material.shininess", 32.f);
+    shader->set_vec3("pointLight.ambient", m_light.ambient);
+    shader->set_vec3("pointLight.diffuse", m_light.diffuse);
+    shader->set_vec3("pointLight.specular", m_light.specular);
+    shader->set_vec3("pointLight.position", m_light.position);
+    shader->set_vec3("pointLight.intensity", m_light.intensity);
+    shader->set_float("pointLight.linearC", 0.003f);
+    shader->set_float("pointLight.quadraticC", 0.0001f);
+    shader->set_float("pointLight.shininess", 32.f);
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
     shader->set_float("spotLight.cut_off", m_spot_light.cut_off);
@@ -238,13 +241,17 @@ void MainController::draw_space_craft() {
     shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
     shader->set_vec3("spotLight.specular", m_spot_light.specular);
 
+    shader->set_float("spotLight.linearC", 0.003f);
+    shader->set_float("spotLight.quadraticC", 0.0001f);
+    shader->set_float("spotLight.shininess", 32.f);
+
     shader->set_vec3("cameraPos", graphics->camera()->Position);
 
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix           = glm::translate(model_matrix, spacecraft_pos);
-    model_matrix           = glm::rotate(model_matrix, spacecraft_rotation, glm::vec3(0.f, 1.f, 0.f));
+    model_matrix           = glm::translate(model_matrix, m_spacecraft_pos);
+    model_matrix           = glm::rotate(model_matrix, m_spacecraft_rotation, glm::vec3(0.f, 1.f, 0.f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.4f));
     shader->set_mat4("model", model_matrix);
     model->draw(shader);
@@ -317,7 +324,7 @@ void MainController::draw() {
     //m_framebuffer->stencil_mask(0xFF);
 
     m_framebuffer->unbind();
-    Bloom::bind_bloom_textures(m_framebuffer);
+    engine::graphics::Bloom::bind_bloom_textures(m_framebuffer);
 
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("bloom_shader");
@@ -328,10 +335,10 @@ void MainController::draw() {
     //m_framebuffer->activate_stencil_texture(1);
 
     shader->use();
-    shader->set_int("bloomSwitch", (Bloom::bloom ? 1 : 0));
+    shader->set_int("bloomSwitch", (engine::graphics::Bloom::bloom ? 1 : 0));
     shader->set_int("screenTexture", 0);
     shader->set_int("bloomTexture", 1);
-    shader->set_float("exposure", exposure);
+    shader->set_float("exposure", m_exposure);
 
     // using slot 1 for stencilTexture
     //shader->set_int("stencilTexture", 1);

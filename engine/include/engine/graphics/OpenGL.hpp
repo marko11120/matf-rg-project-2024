@@ -5,9 +5,13 @@
 
 #ifndef OPENGL_HPP
 #define OPENGL_HPP
+#include "Framebuffer.hpp"
+
+#include <engine/resources/Shader.hpp>
 #include <cstdint>
 #include <filesystem>
-#include <engine/resources/Shader.hpp>
+
+
 
 
 namespace engine::resources {
@@ -34,6 +38,8 @@ namespace engine::graphics {
     *
     * Any OpenGL additional direct OpenGL calls you need should be added here.
     */
+
+
     class OpenGL {
     public:
         using ShaderProgramId = uint32_t;
@@ -137,24 +143,24 @@ namespace engine::graphics {
 
 
         static unsigned int create_framebuffer();
-        static unsigned int create_color_attachment(int SCR_WIDTH, int SCR_HEIGHT);
-        static unsigned int create_render_buffer(int SCR_WIDTH, int SCR_HEIGHT);
+        static unsigned int create_color_attachment(int scr_width, int scr_height);
+        static unsigned int create_render_buffer(int scr_width, int scr_height);
         static unsigned int configure_framebuffer_rectangle();
         static void bind_framebuffer(unsigned int framebuffer);
-        static void bind_colorbuffer(unsigned int colorbuffer);
         static void blend();
-        static void clear_color(float a, float b, float c, float d);
-        static void bind_buffer(unsigned int bufferId);
-        static void draw_arrays(int x);
-        static unsigned int copy_stencil_to_texture();
+        static void clear_color(float r, float g, float b, float a);
+        static void bind_buffer(unsigned int buffer_id);
+        static void draw_arrays(int vertex_count);
+        static void copy_stencil_to_texture(int width, int height, unsigned int stencil_texture);
+        static unsigned int create_texture(int width, int height);
         static void activate_texture(unsigned int texture, int slot);
         static void enable_stencil_testing();
         static void disable_stencil_writing();
-        static void stencil_func(std::string func, int ref, unsigned int mask);
-        static void stencil_op(std::string sfail, std::string dfail, std::string dpass);
+        static void stencil_func(Flags func, int ref, unsigned int mask);
+        static void stencil_op(Flags sfail, Flags dfail, Flags dpass);
         static void stencil_mask(int mask);
-        static void bloom_color_buffers(unsigned int color_buffers[], int SCR_WIDTH, int SCR_HEIGHT);
-
+        static unsigned int create_color_buffer(int scr_width, int scr_height, int attachment_number);
+        static void draw_mrt(int number_of_attachments);
         /**
         * @brief Retrieve the shader compilation error log message.
         * @param shader_id Shader id for which the compilation failed.
