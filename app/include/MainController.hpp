@@ -14,7 +14,7 @@ class MoonEvent;
 
 struct Light{
     glm::vec3 intensity = glm::vec3(1.4f);
-    glm::vec3 position = glm::vec3(15.f, 30.f, -20.f);
+    glm::vec3 position = glm::vec3(25.f, 30.f, -20.f);
     glm::vec3 ambient = glm::vec3(0.8f);
     glm::vec3 diffuse = glm::vec3(1.0f);
     glm::vec3 specular = glm::vec3(1.0f);
@@ -28,8 +28,10 @@ struct SpotLight {
 };
 
 class MainController : public engine::core::Controller {
+public:
+    Light light;
+private:
     friend class MainPlatformEventObserver;
-    friend class MoonEvent;
     bool loop() override;
     void initialize() override;
     void begin_draw() override;
@@ -48,7 +50,6 @@ class MainController : public engine::core::Controller {
     float m_exposure = 1;
     glm::vec3 m_spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float m_spacecraft_rotation = glm::radians(0.f);
-    Light m_light;
     SpotLight m_spot_light;
     engine::graphics::Framebuffer * m_framebuffer;
 };

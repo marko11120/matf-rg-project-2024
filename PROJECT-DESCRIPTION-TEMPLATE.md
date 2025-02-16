@@ -24,7 +24,7 @@
 
 [x] Model with lighting
 [x] Two types of lighting with customizable colors and movement through GUI or ACTIONS
-[] {ACTION_X} --- AFTER_M_SECONDS---Triggers---> {EVENT_A} ---> AFTER_N_SECONDS---Triggers---> {EVENT_B}
+[x] {Moon on/off} --- AFTER_M_SECONDS---Triggers---> {Moon position change} ---> AFTER_N_SECONDS---Triggers---> {space station night light on}
 
 ### Group A:
 

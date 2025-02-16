@@ -8,7 +8,6 @@
 #include "MoonEvent.hpp"
 #include "engine/graphics/Bloom.hpp"
 
-
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
     void on_mouse_move(engine::platform::MousePosition position) override;
     void on_key(engine::platform::Key key) override;
@@ -107,11 +106,11 @@ void MainController::draw_meteors() {
     shader->set_mat4("view", graphics->camera()->view_matrix());
     shader->set_vec3("cameraPos", graphics->camera()->Position);
 
-    shader->set_vec3("pointLight.ambient", m_light.ambient);
-    shader->set_vec3("pointLight.diffuse", m_light.diffuse);
-    shader->set_vec3("pointLight.specular", m_light.specular);
-    shader->set_vec3("pointLight.position", m_light.position);
-    shader->set_vec3("pointLight.intensity", m_light.intensity);
+    shader->set_vec3("pointLight.ambient", light.ambient);
+    shader->set_vec3("pointLight.diffuse", light.diffuse);
+    shader->set_vec3("pointLight.specular", light.specular);
+    shader->set_vec3("pointLight.position", light.position);
+    shader->set_vec3("pointLight.intensity", light.intensity);
     shader->set_float("pointLight.linearC", 0.003f);
     shader->set_float("pointLight.quadraticC", 0.0001f);
     shader->set_float("pointLight.shininess", 32.f);
@@ -168,9 +167,9 @@ void MainController::draw_moon() {
     float time_value = 2*platform->frame_time().current;
     m_moon_event_handler->update_moon(platform->dt());
 
-    shader->set_vec3("light_intensity", m_light.intensity);
+    shader->set_vec3("light_intensity", light.intensity);
     glm::mat4 model_matrix = glm::mat4(1.0f);
-    model_matrix           = glm::translate(model_matrix, m_light.position);
+    model_matrix           = glm::translate(model_matrix, light.position);
     model_matrix           = glm::rotate(model_matrix, glm::radians(time_value), glm::vec3(1.0f, 1.0f, 0.0f));
     model_matrix           = glm::scale(model_matrix, glm::vec3(0.6f));
     shader->set_mat4("model", model_matrix);
@@ -184,11 +183,11 @@ void MainController::draw_space_station() {
     engine::resources::Shader *shader = resources->shader("space_objects");
 
     shader->use();
-    shader->set_vec3("pointLight.ambient", m_light.ambient);
-    shader->set_vec3("pointLight.diffuse", m_light.diffuse);
-    shader->set_vec3("pointLight.specular", m_light.specular);
-    shader->set_vec3("pointLight.position", m_light.position);
-    shader->set_vec3("pointLight.intensity", m_light.intensity);
+    shader->set_vec3("pointLight.ambient", light.ambient);
+    shader->set_vec3("pointLight.diffuse", light.diffuse);
+    shader->set_vec3("pointLight.specular", light.specular);
+    shader->set_vec3("pointLight.position", light.position);
+    shader->set_vec3("pointLight.intensity", light.intensity);
     shader->set_float("pointLight.linearC", 0.003f);
     shader->set_float("pointLight.quadraticC", 0.0001f);
     shader->set_float("pointLight.shininess", 32.f);
@@ -204,6 +203,11 @@ void MainController::draw_space_station() {
 
 
     shader->set_vec3("cameraPos", graphics->camera()->Position);
+
+    if(m_moon_event_handler->get_moon_state() == OFF && light.position.y <= -15.f) {
+        shader->set_vec3("pointLight.intensity", glm::vec3(1.f));
+    }
+
 
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
@@ -221,11 +225,11 @@ void MainController::draw_space_craft() {
     engine::resources::Shader *shader = resources->shader("space_objects");
 
     shader->use();
-    shader->set_vec3("pointLight.ambient", m_light.ambient);
-    shader->set_vec3("pointLight.diffuse", m_light.diffuse);
-    shader->set_vec3("pointLight.specular", m_light.specular);
-    shader->set_vec3("pointLight.position", m_light.position);
-    shader->set_vec3("pointLight.intensity", m_light.intensity);
+    shader->set_vec3("pointLight.ambient", light.ambient);
+    shader->set_vec3("pointLight.diffuse", light.diffuse);
+    shader->set_vec3("pointLight.specular", light.specular);
+    shader->set_vec3("pointLight.position", light.position);
+    shader->set_vec3("pointLight.intensity", light.intensity);
     shader->set_float("pointLight.linearC", 0.003f);
     shader->set_float("pointLight.quadraticC", 0.0001f);
     shader->set_float("pointLight.shininess", 32.f);
@@ -242,6 +246,9 @@ void MainController::draw_space_craft() {
 
     shader->set_vec3("cameraPos", graphics->camera()->Position);
 
+    if(m_moon_event_handler->get_moon_state() == OFF && light.position.y <= -15.f) {
+        shader->set_vec3("pointLight.intensity", glm::vec3(0.6f));
+    }
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     glm::mat4 model_matrix = glm::mat4(1.0f);
@@ -269,15 +276,15 @@ void MainController::draw_gui() {
         ImGui::SliderFloat("Camera z", &camera->Position.z, -20.f, 20.0f, "%.2f");
 
         ImGui::Text("Point light sliders:");
-        ImGui::Text("Point light ambient intensity: (%f, %f, %f)", m_light.ambient.x, m_light.ambient.y,
-                    m_light.ambient.z);
-        ImGui::SliderFloat3("Point light ambient slider", glm::value_ptr(m_light.ambient), 0.1f, 1.f);
-        ImGui::Text("Point diffuse light intensity: (%f, %f, %f)", m_light.diffuse.x, m_light.diffuse.y,
-                    m_light.diffuse.z);
-        ImGui::SliderFloat3("Point diffuse slider", glm::value_ptr(m_light.diffuse), 0.1f, 1.f);
-        ImGui::Text("Point light specular intensity: (%f, %f, %f)", m_light.specular.x, m_light.specular.y,
-                    m_light.specular.z);
-        ImGui::SliderFloat3("Point specular slider", glm::value_ptr(m_light.specular), 0.1f, 1.f);
+        ImGui::Text("Point light ambient intensity: (%f, %f, %f)", light.ambient.x, light.ambient.y,
+                    light.ambient.z);
+        ImGui::SliderFloat3("Point light ambient slider", glm::value_ptr(light.ambient), 0.1f, 1.f);
+        ImGui::Text("Point diffuse light intensity: (%f, %f, %f)", light.diffuse.x, light.diffuse.y,
+                    light.diffuse.z);
+        ImGui::SliderFloat3("Point diffuse slider", glm::value_ptr(light.diffuse), 0.1f, 1.f);
+        ImGui::Text("Point light specular intensity: (%f, %f, %f)", light.specular.x, light.specular.y,
+                    light.specular.z);
+        ImGui::SliderFloat3("Point specular slider", glm::value_ptr(light.specular), 0.1f, 1.f);
 
         ImGui::Text("Spot light sliders:");
         ImGui::Text("Spot light diffuse intensity: (%f, %f, %f)", m_spot_light.diffuse.x, m_spot_light.diffuse.y,
