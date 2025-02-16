@@ -206,6 +206,8 @@ void MainController::draw_space_station() {
 
     if(m_moon_event_handler->get_moon_state() == OFF && light.position.y <= -15.f) {
         shader->set_vec3("pointLight.intensity", glm::vec3(1.f));
+        shader->set_vec3("pointLight.diffuse", glm::vec3(0.f));
+        shader->set_vec3("pointLight.specular", glm::vec3(0.f));
     }
 
 
@@ -248,6 +250,8 @@ void MainController::draw_space_craft() {
 
     if(m_moon_event_handler->get_moon_state() == OFF && light.position.y <= -15.f) {
         shader->set_vec3("pointLight.intensity", glm::vec3(0.6f));
+        shader->set_vec3("pointLight.diffuse", glm::vec3(0.f));
+        shader->set_vec3("pointLight.specular", glm::vec3(0.f));
     }
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
