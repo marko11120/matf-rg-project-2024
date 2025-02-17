@@ -71,7 +71,7 @@ void MainController::initialize() {
     // m_framebuffer->stencil_op("zero", "keep", "replace");
 
     m_framebuffer->bind();
-    engine::graphics::Bloom::bloom_color_buffers(m_framebuffer);
+    engine::graphics::Bloom::create_bloom_color_buffers(m_framebuffer);
 }
 
 bool MainController::loop() {
