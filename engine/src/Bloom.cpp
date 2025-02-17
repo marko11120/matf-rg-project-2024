@@ -9,20 +9,20 @@
 namespace engine::graphics {
     class Framebuffer;
 
-    void engine::graphics::Bloom::bloom_color_buffers(Framebuffer* fbuff) {
+    void Bloom::create_bloom_color_buffers(Framebuffer* fbuff) {
         auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
         int width = platform->window()->width();
         int height = platform->window()->height();
 
-        fbuff->m_color_buffers[0] = engine::graphics::OpenGL::create_color_buffer(width, height, 0);
-        fbuff->m_color_buffers[1] = engine::graphics::OpenGL::create_color_buffer(width, height, 1);
+        fbuff->m_color_buffers[0] = OpenGL::create_color_buffer(width, height, 0);
+        fbuff->m_color_buffers[1] = OpenGL::create_color_buffer(width, height, 1);
 
-        engine::graphics::OpenGL::draw_mrt(2);
+        OpenGL::draw_mrt(2);
     }
 
-    void engine::graphics::Bloom::bind_bloom_textures(Framebuffer* fbuff) {
-        engine::graphics::OpenGL::activate_texture(fbuff->m_color_buffers[0], 0);
-        engine::graphics::OpenGL::activate_texture(fbuff->m_color_buffers[1], 1);
+    void Bloom::bind_bloom_textures(Framebuffer* fbuff) {
+        OpenGL::activate_texture(fbuff->m_color_buffers[0], 0);
+        OpenGL::activate_texture(fbuff->m_color_buffers[1], 1);
     }
 
     bool Bloom::bloom = true;

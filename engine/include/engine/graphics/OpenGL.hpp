@@ -211,7 +211,7 @@ namespace engine::graphics {
         static void stencil_func(Flags func, int ref, unsigned int mask);
 
         /**
-        * @brief actions if stenctil test fails, stencil pass and depth fails, both pass
+        * @brief actions that should be executed based on testing results
         */
         static void stencil_op(Flags sfail, Flags dfail, Flags dpass);
 

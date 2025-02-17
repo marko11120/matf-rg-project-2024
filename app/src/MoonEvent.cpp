@@ -16,15 +16,6 @@ MoonEvent::MoonEvent() {
     event_active = false;
  }
 
-bool MoonEvent::should_switch() {
-    if(event_active && !m_e_pressed) {
-        m_e_pressed = true;
-        return true;
-    }else if(!event_active)
-        m_e_pressed = false;
-
-    return false;
-}
 
 void MoonEvent::update_moon(float delta_time) {
 

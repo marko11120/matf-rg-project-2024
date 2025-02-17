@@ -220,7 +220,7 @@ void MainController::draw_space_station() {
     model->draw(shader);
 }
 
-void MainController::draw_space_craft() {
+void MainController::draw_spacecraft() {
     auto resources                    = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto graphics                     = engine::core::Controller::get<engine::graphics::GraphicsController>();
     engine::resources::Model *model   = resources->model("spacecraft2");
@@ -318,7 +318,7 @@ void MainController::draw() {
     draw_meteors();
     draw_moon();
     draw_space_station();
-    draw_space_craft();
+    draw_spacecraft();
     draw_skybox();
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     if (platform->get_cursor_status()) {

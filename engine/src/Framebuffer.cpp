@@ -13,58 +13,58 @@ namespace engine::graphics {
         int width = platform->window()->width();
         int height = platform->window()->height();
 
-        unsigned int vao = engine::graphics::OpenGL::configure_framebuffer_rectangle();
-        unsigned int framebuffer = engine::graphics::OpenGL::create_framebuffer();
-        unsigned int texture_colorbuffer = engine::graphics::OpenGL::create_color_attachment(width, height);
-        unsigned int rbo = engine::graphics::OpenGL::create_render_buffer(width, height);
-        unsigned int m_stencil_texture = engine::graphics::OpenGL::create_texture(width, height);
+        unsigned int vao = OpenGL::configure_framebuffer_rectangle();
+        unsigned int framebuffer = OpenGL::create_framebuffer();
+        unsigned int texture_color_buffer = OpenGL::create_color_attachment(width, height);
+        unsigned int rbo = OpenGL::create_render_buffer(width, height);
+        unsigned int m_stencil_texture = OpenGL::create_texture(width, height);
 
         m_framebuffer = framebuffer;
-        m_texture_colorbuffer = texture_colorbuffer;
+        m_texture_color_buffer = texture_color_buffer;
         m_vao = vao;
         m_rbo = rbo;
     }
 
     void Framebuffer::bind() {
-        engine::graphics::OpenGL::bind_framebuffer(m_framebuffer);
+        OpenGL::bind_framebuffer(m_framebuffer);
     }
 
     void Framebuffer::unbind() {
-        engine::graphics::OpenGL::bind_framebuffer(0);
+        OpenGL::bind_framebuffer(0);
     }
 
     void Framebuffer::draw_framebuffer_rectangle() {
-        engine::graphics::OpenGL::disable_depth_testing();
-        engine::graphics::OpenGL::clear_buffers();
+        OpenGL::disable_depth_testing();
+        OpenGL::clear_buffers();
 
-        engine::graphics::OpenGL::bind_buffer(m_vao);
-        engine::graphics::OpenGL::draw_arrays(6);
+        OpenGL::bind_buffer(m_vao);
+        OpenGL::draw_arrays(6);
     }
 
     void Framebuffer::enable_stencil_testing() {
-        engine::graphics::OpenGL::enable_stencil_testing();
+        OpenGL::enable_stencil_testing();
     }
     void Framebuffer::disable_stencil_writing() {
-        engine::graphics::OpenGL::disable_stencil_writing();
+        OpenGL::disable_stencil_writing();
     }
 
     void Framebuffer::stencil_func(Flags func, int ref, unsigned int mask) {
-        engine::graphics::OpenGL::stencil_func(func, ref, mask);
+        OpenGL::stencil_func(func, ref, mask);
     }
     void Framebuffer::stencil_op(Flags sfail, Flags dfail, Flags dpass) {
-        engine::graphics::OpenGL::stencil_op(sfail, dfail, dpass);
+        OpenGL::stencil_op(sfail, dfail, dpass);
     }
     void Framebuffer::stencil_mask(int mask) {
-        engine::graphics::OpenGL::stencil_mask(mask);
+        OpenGL::stencil_mask(mask);
     }
 
     void Framebuffer::copy_stencil_to_texture() {
         auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
         int width     = platform->window()->width();
         int height    = platform->window()->height();
-        engine::graphics::OpenGL::copy_stencil_to_texture(width, height, m_stencil_texture);
+        OpenGL::copy_stencil_to_texture(width, height, m_stencil_texture);
     }
     void Framebuffer::activate_stencil_texture(int slot) {
-        engine::graphics::OpenGL::activate_texture(m_stencil_texture, slot);
+        OpenGL::activate_texture(m_stencil_texture, slot);
     }
 }
