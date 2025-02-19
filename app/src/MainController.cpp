@@ -63,7 +63,7 @@ void MainController::initialize() {
     platform->set_cursor_visible(false);
 
     m_framebuffer = new engine::graphics::Framebuffer();
-    m_moon_event_handler           = new MoonEvent();
+    m_moon_event_handler = new MoonEvent();
     engine::graphics::Bloom::bloom = true;
 
     // m_framebuffer->enable_stencil_testing();
@@ -172,7 +172,18 @@ void MainController::draw_moon() {
     float time_value = 2*platform->frame_time().current;
     m_moon_event_handler->update_moon(platform->dt());
 
+    shader->set_vec3("spotLight.direction", graphics->camera()->Front);
+    shader->set_float("spotLight.cut_off", m_spot_light.cut_off);
+    shader->set_float("spotLight.outerCut_off", m_spot_light.outterCut_off);
+    shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
+    shader->set_vec3("spotLight.specular", m_spot_light.specular);
+    shader->set_float("spotLight.linearC", 0.003f);
+    shader->set_float("spotLight.quadraticC", 0.0001f);
+    shader->set_float("spotLight.shininess", 32.f);
     shader->set_vec3("light_intensity", light.intensity);
+
+    shader->set_vec3("cameraPos", graphics->camera()->Position);
+
     glm::mat4 model_matrix = glm::mat4(1.0f);
     model_matrix           = glm::translate(model_matrix, light.position);
     model_matrix           = glm::rotate(model_matrix, glm::radians(time_value), glm::vec3(1.0f, 1.0f, 0.0f));
@@ -208,6 +219,7 @@ void MainController::draw_space_station() {
 
 
     shader->set_vec3("cameraPos", graphics->camera()->Position);
+    shader->set_float("border", 0.8f);
 
     if(m_moon_event_handler->get_moon_state() == OFF && light.position.y <= -15.f) {
         shader->set_vec3("pointLight.intensity", glm::vec3(1.f));
@@ -252,6 +264,7 @@ void MainController::draw_spacecraft() {
     shader->set_float("spotLight.shininess", 32.f);
 
     shader->set_vec3("cameraPos", graphics->camera()->Position);
+    shader->set_float("border", 1.1f);
 
     if(m_moon_event_handler->get_moon_state() == OFF && light.position.y <= -15.f) {
         shader->set_vec3("pointLight.intensity", glm::vec3(0.6f));
@@ -350,6 +363,11 @@ void MainController::draw() {
     shader->set_int("screenTexture", 0);
     shader->set_int("bloomTexture", 1);
     shader->set_float("exposure", m_exposure);
+    if(m_moon_event_handler->get_moon_state() == OFF)
+        shader->set_vec3("greyscale", glm::vec3(0.299f, 0.587f, 0.114f));
+    else if(m_moon_event_handler->get_moon_state() == ON)
+        shader->set_vec3("greyscale", glm::vec3(1.f));
+
 
     // using slot 1 for stencilTexture
     //shader->set_int("stencilTexture", 1);
@@ -361,6 +379,12 @@ void MainController::end_draw() {
     auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     platform->swap_buffers();
 }
+
+void MainController::terminate() {
+    delete m_framebuffer;
+    delete m_moon_event_handler;
+}
+
 
 void MainController::update() {
     update_camera();

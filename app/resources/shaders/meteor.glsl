@@ -58,7 +58,7 @@ uniform SpotLight spotLight;
 uniform PointLight pointLight;
 uniform vec3 cameraPos;
 
-vec3 pointLightCalc(PointLight pointLight, vec3 FragPos, vec3 Normal, vec3 CameraPos, sampler2D texture_diffuse0, sampler2D texture_specular0){
+vec3 pointLightCalc(PointLight pointLight, vec3 FragPos, vec3 Normal, vec3 cameraPos, sampler2D texture_diffuse0, sampler2D texture_specular0){
 
     float distance = length(FragPos - pointLight.position);
     float attenuation = 1.0/(1.0 + pointLight.linearC * distance + pointLight.quadraticC * pow(distance, 2));
@@ -81,7 +81,7 @@ vec3 pointLightCalc(PointLight pointLight, vec3 FragPos, vec3 Normal, vec3 Camer
     return vec3(ambient+diffuse+specular);
 }
 
-vec3 spotLightCalc(SpotLight spotLight, vec3 FragPos, vec3 Normal, vec3 CameraPos, sampler2D texture_diffuse0, sampler2D texture_specular0){
+vec3 spotLightCalc(SpotLight spotLight, vec3 FragPos, vec3 Normal, vec3 cameraPos, sampler2D texture_diffuse0, sampler2D texture_specular0){
 
     vec3 pointLightDir = normalize(FragPos - cameraPos);
     float theta = dot(pointLightDir, normalize(spotLight.direction));

@@ -54,6 +54,7 @@ struct SpotLight{
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_specular0;
 
+uniform float border;
 uniform PointLight pointLight;
 uniform SpotLight spotLight;
 uniform vec3 cameraPos;
@@ -120,7 +121,7 @@ void main(){
     vec3 result = spot + point;
 
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
-    if(brightness >= 1.2)
+    if(brightness >= border)
         BrightColor = vec4(result, 1.0);
     else
         BrightColor = vec4(0.0, 0.0, 0.0, 1.0);

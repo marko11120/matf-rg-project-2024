@@ -20,6 +20,7 @@ in vec2 TexCoords;
 uniform sampler2D screenTexture;
 uniform sampler2D bloomTexture;
 uniform sampler2D stencilTexture;
+uniform vec3 greyscale;
 uniform int bloomSwitch;
 uniform float exposure;
 
@@ -55,9 +56,9 @@ float kernel[9] = float[](
         col += sampleTex[i] * kernel[i];
     }
 
-
     vec3 screenColor = texture(screenTexture, TexCoords).rgb;
-    vec3 result = screenColor + bloomSwitch * col;
+
+    vec3 result = screenColor * greyscale + bloomSwitch * col;
 
     FragColor = vec4(result, 1.f);
 }

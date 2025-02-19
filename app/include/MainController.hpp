@@ -101,12 +101,18 @@ private:
      * @brief updates camera based on platform events
      */
     void update_camera();
+
+    /**
+     * @brief delete memory allocated for drawing resources
+     */
+    void terminate() override;
+
     MoonEvent* m_moon_event_handler;
     float m_exposure = 1;
     glm::vec3 m_spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float m_spacecraft_rotation = glm::radians(0.f);
     SpotLight m_spot_light;
-    engine::graphics::Framebuffer * m_framebuffer;
+    engine::graphics::Framebuffer* m_framebuffer;
 };
 
 

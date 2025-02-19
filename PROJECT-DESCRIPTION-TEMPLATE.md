@@ -1,30 +1,27 @@
-# {Space station}
+# Space station
 
-{307/2023} - {Marko Perisic}  
-{Space station with spacecraft and little synthetic moon as its light source}
+307/2023 - Marko Perisic  
+Space station with spacecraft and little synthetic moon as its light source
 
 ## Controls
 
-{ESC} -> {application terminate}  
-{E} -> {Moon on/off switch}   
-{W} -> {Camera forward}
-{S} -> {Camera backward}
-{A} -> {Camera left}
-{D} -> {Camera right}
-{UP} -> {Spacecraft up}
-{DOWN} -> {Spacecraft down}
-{LEFT} -> {Spacecraft rotate left}
-{RIGHT} -> {Spacecraft rotate right}
-{F12} -> {GUI enable}
-{B} -> {Bloom on/off switch}
+ESC -> application terminate  
+E -> Moon on/off switch   
+W -> Camera forward
+S -> Camera backward
+A -> Camera left
+D -> Camera right
+UP -> Spacecraft up
+DOWN -> Spacecraft down
+LEFT -> Spacecraft rotate left
+RIGHT -> Spacecraft rotate right
+F12 -> GUI enable
+B -> Bloom on/off switch
 
-## Features
-
-### Fundamental:
 
 [x] Model with lighting
 [x] Two types of lighting with customizable colors and movement through GUI or ACTIONS
-[x] {Moon on/off} --- AFTER_M_SECONDS---Triggers---> {Moon position change} ---> AFTER_N_SECONDS---Triggers---> {space station night light on}
+[x] Moon on/off --- When moon is on/off --Triggers---> Moon position change ---> After moon position is changed ---Triggers---> Space station night light on and scene greyscale
 
 ### Group A:
 
@@ -40,16 +37,5 @@
 [ ] Point Shadows  
 [ ] SSAO
 
-### Engine improvement:
-
-[ ]  
-
 ## Models:
 [https://drive.google.com/drive/folders/1g7tulu0S9fIwor31Qgwyl0m8sWO1cCXX?usp=sharing]
-
-## Textures
-
-[link1]  
-[link2]
-
-{OTHER-RESOURCES}
