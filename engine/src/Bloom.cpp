@@ -3,26 +3,25 @@
 //
 
 #include <engine/graphics/Bloom.hpp>
-#include <../../engine/include/engine/graphics/OpenGL.hpp>
-#include <../../engine/include/engine/platform/PlatformController.hpp>
+#include <engine/graphics/OpenGL.hpp>
 
 namespace engine::graphics {
     class Framebuffer;
 
-    void Bloom::create_bloom_color_buffers(Framebuffer* fbuff) {
-        auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-        int width = platform->window()->width();
-        int height = platform->window()->height();
+    unsigned int Bloom::create_hdr_color_buffer(unsigned int scr_width, unsigned int scr_height, unsigned int attachment_number) {
 
-        fbuff->m_color_buffers[0] = OpenGL::create_color_buffer(width, height, 0);
-        fbuff->m_color_buffers[1] = OpenGL::create_color_buffer(width, height, 1);
+        unsigned int id = OpenGL::create_color_buffer(scr_width, scr_height, attachment_number);
 
-        OpenGL::draw_mrt(2);
+        return id;
     }
 
-    void Bloom::bind_bloom_textures(Framebuffer* fbuff) {
-        OpenGL::activate_texture(fbuff->m_color_buffers[0], 0);
-        OpenGL::activate_texture(fbuff->m_color_buffers[1], 1);
+    void Bloom::mrt(unsigned int texture_number) {
+        OpenGL::draw_mrt(texture_number);
+    }
+
+    void Bloom::bind_bloom_textures(unsigned int* color_buffers) {
+        OpenGL::activate_texture(color_buffers[0], 0);
+        OpenGL::activate_texture(color_buffers[1], 1);
     }
 
     bool Bloom::bloom = true;

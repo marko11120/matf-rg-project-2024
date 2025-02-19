@@ -4,7 +4,7 @@
 
 #ifndef BLOOM_H
 #define BLOOM_H
-#include "Framebuffer.hpp"
+
 
 namespace engine::graphics {
     class Bloom {
@@ -15,16 +15,25 @@ namespace engine::graphics {
         static bool bloom;
 
         /**
-        * @brief  creates two hdr color buffers and store their ids in fbuff->m_color_buffers array
-        * @param fbuff instance of framebuffer where we store ids of color buffers
+        * @brief  create hdr color buffer and attaches it to active framebuffer
+        * @param attachment_number attaches it as this number
+        * @param scr_width width of color buffer
+        * @param scr_height height of color buffer
+        * @returns id of created hdr color buffer
         **/
-        static void create_bloom_color_buffers(Framebuffer* fbuff);
+        static unsigned int create_hdr_color_buffer(unsigned int scr_width, unsigned int scr_height, unsigned int attachment_number);
+
+        /**
+         * @brief sets mrt drawing
+         * @param textures_number render into this number of textures
+         */
+      static void mrt(unsigned int texture_number);
 
         /**
         * @brief binds and activates textures on slots one and two
-        * * @param fbuff instance of framebuffer where are texture ids stored
+        * @param fbuff array of texture ids
         **/
-        static void bind_bloom_textures(Framebuffer* fbuff);
+        static void bind_bloom_textures(unsigned int* color_buffers);
     };
 }
 

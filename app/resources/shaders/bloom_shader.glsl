@@ -58,9 +58,6 @@ float kernel[9] = float[](
 
     vec3 screenColor = texture(screenTexture, TexCoords).rgb;
     vec3 result = screenColor + bloomSwitch * col;
-    //const float gamma = 2.2;
-    //result = result - exp(-screenColor * exposure);
-    //result = pow(result, vec3(1.0 / gamma));
 
     FragColor = vec4(result, 1.f);
 }

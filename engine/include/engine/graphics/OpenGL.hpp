@@ -5,8 +5,8 @@
 
 #ifndef OPENGL_HPP
 #define OPENGL_HPP
-#include "Framebuffer.hpp"
 
+#include "Framebuffer.hpp"
 #include <engine/resources/Shader.hpp>
 #include <cstdint>
 #include <filesystem>
@@ -143,55 +143,79 @@ namespace engine::graphics {
 
         /**
         * @brief creates and bind framebuffer
+        * @returns framebuffer id
         */
         static unsigned int create_framebuffer();
 
         /**
         * @brief creates color attachment and returns its id
+        * @param scr_width widht of created color attachment
+        * @param scr_height height of created color attachment
+        * @returns color attachment id
         */
         static unsigned int create_color_attachment(int scr_width, int scr_height);
 
         /**
         * @brief creates render buffer and returns its id
+        * @param scr_width width of render buffer
+        * @param scr_height height of render buffer
+        * @returns render buffer id
         */
         static unsigned int create_render_buffer(int scr_width, int scr_height);
 
         /**
         * @brief sends rectangle data on GPU for drawing
+        * @returns vao id
         */
         static unsigned int configure_framebuffer_rectangle();
+
         /**
         * @brief binds frame buffer
+        * @param framebuffer id for binding the framebuffer
         */
         static void bind_framebuffer(unsigned int framebuffer);
 
         /**
         * @brief set state color to (r, g, b, a) and clears color buffer
+        * @param r percent of red
+        * @param g percent of green
+        * @param b percent of blue
+        * @param a percent of transparency
         */
         static void clear_color(float r, float g, float b, float a);
 
         /**
         * @brief binds vertex array
+        * @param buffer_id id that should be binded
         */
         static void bind_buffer(unsigned int buffer_id);
 
         /**
-        * @brief specify to openGL how vertex should use for drawing
+        * @brief calls OpenGL glDrawArrays to draw triangles
+        * @param vertex_count number of vertexes that should be used for drawing
         */
         static void draw_arrays(int vertex_count);
 
         /**
         * @brief copies data from stencil buffer to texture with id stencil_texture
+        * @param width width of texture
+        * @param height height of texture
+        * @param stencil_texture stencil texture id
         */
         static void copy_stencil_to_texture(int width, int height, unsigned int stencil_texture);
 
         /**
         * @brief creates texture
+        * @param width width of texture
+        * @param height height of texture
+        * @returns returns texture id
         */
         static unsigned int create_texture(int width, int height);
 
         /**
         * @brief activate texture slot and binds texture
+        * @param texture id of texture that should be activated
+        * @param slot slot on which texture should be avaliable
         */
         static void activate_texture(unsigned int texture, int slot);
 
@@ -206,27 +230,39 @@ namespace engine::graphics {
         static void disable_stencil_writing();
 
         /**
-        * @brief determines the way of writing in stencil buff
+        * @brief determines the way of writing into stencil buff
+        * @param func flag for functions which be used
+        * @param ref value that will be tested with stencil buffer value
+        * @param mask maks that ANDs ref value and stencil buff value before testing
         */
         static void stencil_func(Flags func, int ref, unsigned int mask);
 
         /**
         * @brief actions that should be executed based on testing results
+        * @param sfail action if stencil test fails
+        * @param dfail aciton if stencil test pass and depth test fails
+        * @param dpass action if both tests pass
         */
         static void stencil_op(Flags sfail, Flags dfail, Flags dpass);
 
         /**
         * @brief sets stencil mask to mask
+        * @param mask value for evaluating stencil mask
         */
         static void stencil_mask(int mask);
 
         /**
         * @brief creates hdr texture and attaches it to color attachment number attachment_number
+        * @param scr_height screen height
+        * @param scr_width screen width
+        * @param attachment_number as which number should by attached to framebuffer
+        * @returns color buffer id
         */
         static unsigned int create_color_buffer(int scr_width, int scr_height, int attachment_number);
 
         /**
         * @brief MRT(multiple render targets) for number_of_attachments color attachments
+        * @param number_of_attachments how many attachments should be set to draw into
         */
         static void draw_mrt(int number_of_attachments);
         /**

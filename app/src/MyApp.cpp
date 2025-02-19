@@ -1,9 +1,6 @@
-#include <engine/platform/PlatformController.hpp>
-
-#include "../include/MyApp.hpp"
-
-#include "../../engine/libs/spdlog/include/spdlog/spdlog.h"
+#include "MyApp.hpp"
 #include "MainController.hpp"
+#include "spdlog/spdlog.h"
 
 void MyApp::app_setup() {
     spdlog::info("Hello, setup!");

@@ -26,7 +26,6 @@ enum Flags{
 
 namespace engine::graphics {
     class Framebuffer {
-        friend class Bloom;
     public:
         /**
         * @brief constructor, initialize all private variables by calling appropriate functions
@@ -82,7 +81,7 @@ namespace engine::graphics {
         * @param sfail action if stencil test fails
         * @param dfail aciton if stencil test pass and depth test fails
         * @param dpass action if both tests pass
-        **/
+        */
         static void stencil_op(Flags sfail, Flags dfail, Flags dpass);
 
         /**
@@ -90,10 +89,9 @@ namespace engine::graphics {
         */
         static void stencil_mask(int mask);
 
+        unsigned int color_buffers[2];
     private:
         unsigned int m_vao, m_rbo, m_framebuffer, m_texture_color_buffer, m_stencil_texture;
-        unsigned int m_color_buffers[2];
-
     };
 }
 

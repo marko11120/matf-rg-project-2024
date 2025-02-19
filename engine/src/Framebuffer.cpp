@@ -3,8 +3,8 @@
 //
 
 #include <engine/graphics/Framebuffer.hpp>
-#include <../../engine/include/engine/graphics/OpenGL.hpp>
-#include <../../engine/include/engine/platform/PlatformController.hpp>
+#include <engine/graphics/OpenGL.hpp>
+#include <engine/platform/PlatformController.hpp>
 
 namespace engine::graphics {
     Framebuffer::Framebuffer() {
@@ -67,4 +67,4 @@ namespace engine::graphics {
     void Framebuffer::activate_stencil_texture(int slot) {
         OpenGL::activate_texture(m_stencil_texture, slot);
     }
-}
+} // namespace engine::graphics

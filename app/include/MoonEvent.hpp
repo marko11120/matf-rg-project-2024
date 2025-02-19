@@ -13,7 +13,7 @@ enum MoonState { OFF, FADING_IN, ON, FADING_OUT };
 class MoonEvent {
 public:
     /**
-     * @brief contructor
+     * @brief constructor, initialize private vars
      */
     MoonEvent();
 
@@ -25,6 +25,7 @@ public:
 
     /**
      * @brief returns moons state
+     * @returns enum representing active moon state
      */
     MoonState get_moon_state() const;
 

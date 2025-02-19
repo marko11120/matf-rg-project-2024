@@ -32,9 +32,25 @@ public:
     PointLight light;
 private:
     friend class MainPlatformEventObserver;
+
+    /**
+     * @brief determines does render loop should continue or not
+     */
     bool loop() override;
+
+    /**
+     * @brief initialize main controller
+     */
     void initialize() override;
+
+    /**
+     * @brief sets up resources for drawing
+     */
     void begin_draw() override;
+
+    /**
+     * @brief calls other draws functions to draw scene
+     */
     void draw() override;
     /**
      * @brief draws full screen rectangle in framebuffer stored into class instance
@@ -71,7 +87,14 @@ private:
      */
     void draw_gui();
 
+    /**
+     * @brief function marks end of drawing, calls swap buffers and deinitialization
+     */
     void end_draw() override;
+
+    /**
+     * @update update changed states before drawing
+     */
     void update() override;
 
     /**

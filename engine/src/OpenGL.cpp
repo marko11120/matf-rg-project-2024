@@ -1,11 +1,9 @@
 #include <glad/glad.h>
 #include <engine/graphics/OpenGL.hpp>
-#include <engine/platform/PlatformController.hpp>
 #include <engine/resources/Shader.hpp>
 #include <engine/resources/ShaderCompiler.hpp>
 #include <engine/util/Errors.hpp>
 #include <engine/util/Utils.hpp>
-#include <spdlog/spdlog.h>
 #include <stb_image.h>
 
 
@@ -237,7 +235,6 @@ namespace engine::graphics {
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
             throw new util::EngineError(util::EngineError::Type::OpenGLError, "Failed to create render buffer!");
 
-        spdlog::info("OpenGL render buffer created.");
         CHECKED_GL_CALL(glBindFramebuffer, GL_FRAMEBUFFER, 0);
 
         return rbo;
@@ -348,7 +345,6 @@ namespace engine::graphics {
     }
 
     void OpenGL::copy_stencil_to_texture(int width, int height, unsigned int stencil_texture) {
-
 
         // copy to texture from stencil buff
         GLubyte* stencil_data = new GLubyte[width * height];

@@ -71,7 +71,12 @@ void MainController::initialize() {
     // m_framebuffer->stencil_op("zero", "keep", "replace");
 
     m_framebuffer->bind();
-    engine::graphics::Bloom::create_bloom_color_buffers(m_framebuffer);
+    unsigned int tmp[2];
+    unsigned int scr_height = platform->window()->height();
+    unsigned int scr_width = platform->window()->width();
+    m_framebuffer->color_buffers[0] = engine::graphics::Bloom::create_hdr_color_buffer(scr_width, scr_height, 0);
+    m_framebuffer->color_buffers[1] = engine::graphics::Bloom::create_hdr_color_buffer(scr_width, scr_height, 1);
+    engine::graphics::Bloom::mrt(2);
 }
 
 bool MainController::loop() {
@@ -330,7 +335,7 @@ void MainController::draw() {
     //m_framebuffer->stencil_mask(0xFF);
 
     m_framebuffer->unbind();
-    engine::graphics::Bloom::bind_bloom_textures(m_framebuffer);
+    engine::graphics::Bloom::bind_bloom_textures(m_framebuffer->color_buffers);
 
     auto resources = engine::core::Controller::get<engine::resources::ResourcesController>();
     auto shader = resources->shader("bloom_shader");
