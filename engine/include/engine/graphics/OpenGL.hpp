@@ -176,7 +176,7 @@ namespace engine::graphics {
         static void bind_framebuffer(unsigned int framebuffer);
 
         /**
-        * @brief set state color to (r, g, b, a) and clears color buffer
+        * @brief set OpenGL state color to (r, g, b, a) and clears color buffer
         * @param r percent of red
         * @param g percent of green
         * @param b percent of blue
@@ -258,7 +258,7 @@ namespace engine::graphics {
         * @param attachment_number as which number should by attached to framebuffer
         * @returns color buffer id
         */
-        static unsigned int create_color_buffer(int scr_width, int scr_height, int attachment_number);
+        static unsigned int create_and_attach_color_buffer(int scr_width, int scr_height, int attachment_number);
 
         /**
         * @brief MRT(multiple render targets) for number_of_attachments color attachments

@@ -215,15 +215,15 @@ namespace engine::graphics {
     }
 
     unsigned int OpenGL::create_color_attachment(int scr_width, int scr_height) {
-        unsigned int textureColorbuffer;
-        CHECKED_GL_CALL(glGenTextures, 1, &textureColorbuffer);
-        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, textureColorbuffer);
+        unsigned int texture_color_buffer;
+        CHECKED_GL_CALL(glGenTextures, 1, &texture_color_buffer);
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, texture_color_buffer);
         CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGB, scr_width, scr_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
+        CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color_buffer, 0);
 
-        return textureColorbuffer;
+        return texture_color_buffer;
     }
     unsigned int OpenGL::create_render_buffer(int scr_width, int scr_height) {
         unsigned int rbo;
@@ -269,7 +269,7 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glBindBuffer, GL_ARRAY_BUFFER, vbo);
         CHECKED_GL_CALL(glBufferData, GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
         CHECKED_GL_CALL(glEnableVertexAttribArray, 0);
-        CHECKED_GL_CALL(glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) 0);
+        CHECKED_GL_CALL(glVertexAttribPointer, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
         CHECKED_GL_CALL(glEnableVertexAttribArray, 1);
         CHECKED_GL_CALL(glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
                         (void *) (2 * sizeof(float)));
@@ -321,7 +321,7 @@ namespace engine::graphics {
             case INCR: dfail_ = GL_INCR; break;
             case DECR: dfail_ = GL_DECR; break;
             case INVERT: dfail_ = GL_INVERT; break;
-            default: sfail_ = GL_KEEP; break;
+            default: dfail_ = GL_KEEP; break;
         }
         GLenum dpass_;
 
@@ -347,7 +347,7 @@ namespace engine::graphics {
     void OpenGL::copy_stencil_to_texture(int width, int height, unsigned int stencil_texture) {
 
         // copy to texture from stencil buff
-        GLubyte* stencil_data = new GLubyte[width * height];
+        auto stencil_data = new GLubyte[width * height];
 
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
         CHECKED_GL_CALL(glTexSubImage2D, GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, (const void*)stencil_data);
@@ -360,14 +360,14 @@ namespace engine::graphics {
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, texture);
     }
 
-    unsigned int OpenGL::create_color_buffer(int scr_width, int scr_height, int attachment_number) {
+    unsigned int OpenGL::create_and_attach_color_buffer(int scr_width, int scr_height, int attachment_number) {
         unsigned int color_buffer;
         CHECKED_GL_CALL(glGenTextures, 1, &color_buffer);
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, color_buffer);
         CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA16F, scr_width, scr_height, 0, GL_RGBA, GL_FLOAT, nullptr);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);  // we clamp to the edge as the blur filter would otherwise sample repeated texture values!
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         // attach texture to framebuffer
         CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + attachment_number, GL_TEXTURE_2D, color_buffer, 0);

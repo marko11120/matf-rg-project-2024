@@ -1,8 +1,6 @@
 //
 // Created by marko on 2/11/25.
 //
-
-#include <engine/platform/PlatformController.hpp>
 #include "MoonEvent.hpp"
 #include "MainController.hpp"
 #include "glm/vec3.hpp"
@@ -16,11 +14,8 @@ MoonEvent::MoonEvent() {
     event_active = false;
  }
 
-
 void MoonEvent::update_moon(float delta_time) {
-
-    auto platform       = engine::core::Controller::get<engine::platform::PlatformController>();
-    auto main_controller = platform->get<MainController>();
+    auto main_controller = engine::core::Controller::get<MainController>();
 
     switch (m_moon_state) {
     case OFF:

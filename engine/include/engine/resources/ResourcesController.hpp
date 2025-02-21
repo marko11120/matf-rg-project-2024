@@ -96,8 +96,6 @@ namespace engine::resources {
         */
         void load_shaders();
 
-        void configure_resources_framebuffering();
-
         /**
         * @brief A hashmap of all the loaded @ref Model.
         */

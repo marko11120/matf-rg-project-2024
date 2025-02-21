@@ -19,7 +19,7 @@ public:
 
     /**
      * @brief updates moon based on it state
-     * @param delta_time time diff between two frames so the speed doesn't depend on number of frames
+     * @param delta_time time diff between two frames, speed doesn't depend on number of frames
      */
     void update_moon(float delta_time);
 
@@ -30,7 +30,7 @@ public:
     MoonState get_moon_state() const;
 
     /**
-     * @brief this var is like semaphore, one event(turn off/one) can not be started if the other one is active
+     * @brief this var is like semaphore, one event can not be started if the other one is active
      */
     bool event_active;
 private:
@@ -38,10 +38,7 @@ private:
     float m_brightness;
     float m_fade_speed;
     float m_moving_speed;
-    bool m_e_pressed = false;
-    bool m_should_turn_on = true;
+    bool m_e_pressed;
 };
-
-
 
 #endif //MOONEVENT_H

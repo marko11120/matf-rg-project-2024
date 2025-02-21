@@ -9,6 +9,7 @@
 
 namespace engine::graphics {
     class Framebuffer;
+    class Bloom;
 }
 class MoonEvent;
 
@@ -24,7 +25,7 @@ struct SpotLight {
     glm::vec3 diffuse = glm::vec3(0.9f);
     glm::vec3 specular = glm::vec3(0.9f);
     float cut_off = cos(glm::radians(12.5f));
-    float outterCut_off = cos(glm::radians(17.5f));
+    float outer_cut_off = cos(glm::radians(17.5f));
 };
 
 class MainController : public engine::core::Controller {
@@ -49,38 +50,34 @@ private:
     void begin_draw() override;
 
     /**
-     * @brief calls other draws functions to draw scene
+     * @brief calls other draw functions to draw scene
      */
     void draw() override;
-    /**
-     * @brief draws full screen rectangle in framebuffer stored into class instance
-     */
-    void draw_framebuffer_rectangle();
 
     /**
      * @brief draws skybox
      */
-    void draw_skybox();
+    static void draw_skybox();
 
     /**
      * @brief draws meteors
      */
-    void draw_meteors();
+    void draw_meteors() const;
 
     /**
      * @brief draws moon
      */
-    void draw_moon();
+    void draw_moon() const;
 
     /**
      * @brief draws space station
      */
-    void draw_space_station();
+    void draw_space_station() const;
 
     /**
      * @brief draws spacecraft
      */
-    void draw_spacecraft();
+    void draw_spacecraft() const;
 
     /**
      * @brief draws GUI
@@ -112,7 +109,7 @@ private:
     glm::vec3 m_spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float m_spacecraft_rotation = glm::radians(0.f);
     SpotLight m_spot_light;
-    engine::graphics::Framebuffer* m_framebuffer;
+    engine::graphics::Framebuffer * m_framebuffer;
 };
 
 

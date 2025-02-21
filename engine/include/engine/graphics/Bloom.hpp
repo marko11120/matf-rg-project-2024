@@ -4,7 +4,7 @@
 
 #ifndef BLOOM_H
 #define BLOOM_H
-
+#include <vector>
 
 namespace engine::graphics {
     class Bloom {
@@ -21,19 +21,19 @@ namespace engine::graphics {
         * @param scr_height height of color buffer
         * @returns id of created hdr color buffer
         **/
-        static unsigned int create_hdr_color_buffer(unsigned int scr_width, unsigned int scr_height, unsigned int attachment_number);
+        static unsigned int create_hdr_color_buffer(int scr_width, int scr_height, int attachment_number);
 
         /**
          * @brief sets mrt drawing
-         * @param textures_number render into this number of textures
+         * @param texture_number render into this number of textures
          */
-      static void mrt(unsigned int texture_number);
+        static void mrt(int texture_number);
 
         /**
         * @brief binds and activates textures on slots one and two
-        * @param fbuff array of texture ids
+        * @param color_buffers vector of texture ids
         **/
-        static void bind_bloom_textures(unsigned int* color_buffers);
+        static void activate_bloom_textures(const std::vector<unsigned int>& color_buffers);
     };
 }
 

@@ -281,14 +281,13 @@ namespace engine::platform {
     }
 
     void PlatformController::set_cursor_visible(bool flag) {
-        auto platform = engine::core::Controller::get<platform::PlatformController>();
-        auto window = platform->window()->handle_();
+        auto glfw_window = window()->handle_();
         m_cursor_visible = flag;
 
         if(flag)
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         else {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
     }
 

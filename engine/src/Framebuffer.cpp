@@ -7,33 +7,23 @@
 #include <engine/platform/PlatformController.hpp>
 
 namespace engine::graphics {
-    Framebuffer::Framebuffer() {
-        auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
-
-        int width = platform->window()->width();
-        int height = platform->window()->height();
-
-        unsigned int vao = OpenGL::configure_framebuffer_rectangle();
-        unsigned int framebuffer = OpenGL::create_framebuffer();
-        unsigned int texture_color_buffer = OpenGL::create_color_attachment(width, height);
-        unsigned int rbo = OpenGL::create_render_buffer(width, height);
-        unsigned int m_stencil_texture = OpenGL::create_texture(width, height);
-
-        m_framebuffer = framebuffer;
-        m_texture_color_buffer = texture_color_buffer;
-        m_vao = vao;
-        m_rbo = rbo;
+    Framebuffer::Framebuffer(int width, int height) {
+        m_vao = OpenGL::configure_framebuffer_rectangle();
+        m_framebuffer = OpenGL::create_framebuffer();
+        m_texture_color_buffer = OpenGL::create_color_attachment(width, height);
+        m_rbo = OpenGL::create_render_buffer(width, height);
+        m_stencil_texture = OpenGL::create_texture(width, height);
     }
 
-    void Framebuffer::bind() {
+    void Framebuffer::bind() const{
         OpenGL::bind_framebuffer(m_framebuffer);
     }
 
-    void Framebuffer::unbind() {
+    void Framebuffer::unbind() const{
         OpenGL::bind_framebuffer(0);
     }
 
-    void Framebuffer::draw_framebuffer_rectangle() {
+    void Framebuffer::draw_fullscreen_quad() const{
         OpenGL::disable_depth_testing();
         OpenGL::clear_buffers();
 
@@ -58,13 +48,13 @@ namespace engine::graphics {
         OpenGL::stencil_mask(mask);
     }
 
-    void Framebuffer::copy_stencil_to_texture() {
+    void Framebuffer::copy_stencil_to_texture() const{
         auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
         int width     = platform->window()->width();
         int height    = platform->window()->height();
         OpenGL::copy_stencil_to_texture(width, height, m_stencil_texture);
     }
-    void Framebuffer::activate_stencil_texture(int slot) {
+    void Framebuffer::activate_stencil_texture(int slot) const{
         OpenGL::activate_texture(m_stencil_texture, slot);
     }
 } // namespace engine::graphics

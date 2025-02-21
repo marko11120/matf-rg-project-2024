@@ -4,11 +4,11 @@
 
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
-
+#include <vector>
 
 /**
-* @brief enum with all GLenum values for computing stencil buffer functions in OpenGL
-**/
+ * @brief enum with all GLenum values for computing stencil buffer functions in OpenGL
+ **/
 enum Flags{
     NEVER,
     ALWAYS,
@@ -30,33 +30,33 @@ namespace engine::graphics {
         /**
         * @brief constructor, initialize all private variables by calling appropriate functions
         **/
-        Framebuffer();
+        Framebuffer(int width, int height);
 
         /**
         * @brief binds framebuffer
         **/
-        void bind();
+        void bind() const;
 
         /**
         * @brief unbinds framebuffer
         **/
-        void unbind();
+        void unbind() const;
 
         /**
-        * @brief disables depth testing and draw rectangle into active framebuffer
+        * @brief disables depth testing and draws fullscreen quad, necessary for postprocessing, into active framebuffer
         **/
-        void draw_framebuffer_rectangle();
+        void draw_fullscreen_quad() const;
 
         /**
         * @brief copies stencil buffer content into texture with m_texture_color_buffer id
         **/
-        void copy_stencil_to_texture();
+        void copy_stencil_to_texture() const;
 
         /**
         * @brief activates stencil texture with id m_stencil_texture
         * @param slot slot on which it will bind texture
         **/
-        void activate_stencil_texture(int slot);
+        void activate_stencil_texture(int slot) const;
 
         /**
         * @brief enables stencil testing
@@ -89,7 +89,7 @@ namespace engine::graphics {
         */
         static void stencil_mask(int mask);
 
-        unsigned int color_buffers[2];
+        std::vector<unsigned int> color_buffers;
     private:
         unsigned int m_vao, m_rbo, m_framebuffer, m_texture_color_buffer, m_stencil_texture;
     };
