@@ -24,8 +24,8 @@ void MoonEvent::update_moon(float delta_time) {
             m_moon_state = FADING_IN;
         }else {
             // -10.f for y value is moons off position, slightly bellow space station
-            if(main_controller->light.position.y > -15.f)
-                main_controller->light.position.y -= m_moving_speed * delta_time;
+            if(main_controller->point_light.position.y > -15.f)
+                main_controller->point_light.position.y -= m_moving_speed * delta_time;
         }
         break;
 
@@ -43,8 +43,8 @@ void MoonEvent::update_moon(float delta_time) {
         if (event_active) {
             m_moon_state = FADING_OUT;
         }else {
-            if(main_controller->light.position.y < 30.f)
-                main_controller->light.position.y += m_moving_speed * delta_time;
+            if(main_controller->point_light.position.y < 30.f)
+                main_controller->point_light.position.y += m_moving_speed * delta_time;
         }
         break;
 
@@ -58,7 +58,7 @@ void MoonEvent::update_moon(float delta_time) {
         break;
     }
 
-    main_controller->light.intensity = glm::vec3(m_brightness);
+    main_controller->point_light.intensity = glm::vec3(m_brightness);
 }
 
 MoonState MoonEvent::get_moon_state() const {

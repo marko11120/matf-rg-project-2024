@@ -44,8 +44,8 @@ struct SpotLight{
     vec3 diffuse;
     vec3 specular;
     vec3 direction;
-    float cut_off;
-    float outerCut_off;
+    float cutOff;
+    float outerCutOff;
     float linearC;
     float quadraticC;
     float shininess;
@@ -91,27 +91,27 @@ vec3 spotLightCalc(SpotLight spotLight, vec3 FragPos, vec3 Normal, vec3 CameraPo
     // already set
     //diffuse
     float diff = max(dot(-pointLightDir, normalize(Normal)), 0.0);
-    vec3 diffuse_spotLight = spotLight.diffuse * texture(texture_diffuse0, TexCoords).rgb * diff;
+    vec3 diffuseSpotLight = spotLight.diffuse * texture(texture_diffuse0, TexCoords).rgb * diff;
 
     //specular
     float specularStrength = 0.8;
     vec3 viewDir = normalize(cameraPos - FragPos);
     vec3 reflectDir = normalize(reflect(pointLightDir, Normal));
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), spotLight.shininess);
-    vec3 specular_spotLight = spotLight.specular * texture(texture_specular0, TexCoords).rgb * spec * specularStrength;
+    vec3 specularSpotLight = spotLight.specular * texture(texture_specular0, TexCoords).rgb * spec * specularStrength;
 
-    float proximity = (theta - spotLight.outerCut_off) / (spotLight.cut_off - spotLight.outerCut_off);
+    float proximity = (theta - spotLight.outerCutOff) / (spotLight.cutOff - spotLight.outerCutOff);
     float intensity = clamp(proximity, 0.0, 1.0);
-    diffuse_spotLight *= intensity;
-    specular_spotLight *= intensity;
+    diffuseSpotLight *= intensity;
+    specularSpotLight *= intensity;
 
     //attenuation
     float d = length(cameraPos - FragPos);
     float att = 1.0 / (1.0 + d * spotLight.linearC + pow(d, 2) * spotLight.quadraticC);
-    diffuse_spotLight *= att;
-    specular_spotLight *= att;
+    diffuseSpotLight *= att;
+    specularSpotLight *= att;
 
-    return vec3(diffuse_spotLight + specular_spotLight);
+    return vec3(diffuseSpotLight + specularSpotLight);
 }
 
 void main(){

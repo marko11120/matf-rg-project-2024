@@ -13,12 +13,16 @@ namespace engine::graphics {
 }
 class MoonEvent;
 
-struct PointLight{
+struct PointLight {
+    glm::vec3 ambient   = glm::vec3(0.8f);
+    glm::vec3 diffuse   = glm::vec3(1.0f);
+    glm::vec3 specular  = glm::vec3(1.0f);
     glm::vec3 intensity = glm::vec3(1.4f);
     glm::vec3 position = glm::vec3(25.f, 30.f, -20.f);
-    glm::vec3 ambient = glm::vec3(0.8f);
-    glm::vec3 diffuse = glm::vec3(1.0f);
-    glm::vec3 specular = glm::vec3(1.0f);
+
+    float linear = 0.003f;
+    float quadratic = 0.0001f;
+    float shininess = 32.0f;
 };
 
 struct SpotLight {
@@ -26,11 +30,15 @@ struct SpotLight {
     glm::vec3 specular = glm::vec3(0.9f);
     float cut_off = cos(glm::radians(12.5f));
     float outer_cut_off = cos(glm::radians(17.5f));
+
+    float linear = 0.003f;
+    float quadratic = 0.0001f;
+    float shininess = 32.0f;
 };
 
 class MainController : public engine::core::Controller {
 public:
-    PointLight light;
+    PointLight point_light;
 private:
     friend class MainPlatformEventObserver;
 
@@ -105,7 +113,6 @@ private:
     void terminate() override;
 
     MoonEvent* m_moon_event_handler;
-    float m_exposure = 1;
     glm::vec3 m_spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float m_spacecraft_rotation = glm::radians(0.f);
     SpotLight m_spot_light;
