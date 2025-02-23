@@ -26,8 +26,8 @@ struct PointLight {
 };
 
 struct SpotLight {
-    glm::vec3 diffuse = glm::vec3(0.9f);
-    glm::vec3 specular = glm::vec3(0.9f);
+    glm::vec3 diffuse = glm::vec3(1.f);
+    glm::vec3 specular = glm::vec3(1.f);
     float cut_off = cos(glm::radians(12.5f));
     float outer_cut_off = cos(glm::radians(17.5f));
 
@@ -112,10 +112,11 @@ private:
      */
     void terminate() override;
 
+    bool m_spotlight_switch = 1;
     MoonEvent* m_moon_event_handler;
     glm::vec3 m_spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float m_spacecraft_rotation = glm::radians(0.f);
-    SpotLight m_spot_light;
+    SpotLight m_spotlight;
     engine::graphics::Framebuffer * m_framebuffer;
 };
 

@@ -50,7 +50,11 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
         main_controller->m_spacecraft_rotation -= platform->dt() * 1.f;
     } else if (platform->key(engine::platform::KeyId::KEY_B).is_down()) {
         engine::graphics::Bloom::bloom = !engine::graphics::Bloom::bloom;
+    } else if(platform->key(engine::platform::KeyId::KEY_Q).is_down()) {
+        if(main_controller->m_moon_event_handler->get_moon_state() == OFF)
+            main_controller->m_spotlight_switch = !main_controller->m_spotlight_switch;
     }
+
 }
 
 void MainController::initialize() {
@@ -112,13 +116,17 @@ void MainController::draw_meteors() const{
     shader->set_float("pointLight.shininess", point_light.shininess);
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
-    shader->set_float("spotLight.cutOff", m_spot_light.cut_off);
-    shader->set_float("spotLight.outerCutOff", m_spot_light.outer_cut_off);
-    shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
-    shader->set_vec3("spotLight.specular", m_spot_light.specular);
-    shader->set_float("spotLight.linearC", m_spot_light.linear);
-    shader->set_float("spotLight.quadraticC", m_spot_light.quadratic);
-    shader->set_float("spotLight.shininess", m_spot_light.shininess);
+    shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
+    shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
+    shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
+    shader->set_vec3("spotLight.specular", m_spotlight.specular);
+    shader->set_float("spotLight.linearC", m_spotlight.linear);
+    shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
+    shader->set_float("spotLight.shininess", m_spotlight.shininess);
+    if(m_moon_event_handler->get_moon_state() == OFF)
+        shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
+
+
 
     static glm::vec3 positions [] = {
         glm::vec3(-29.0f,  -17.0f, -28.0f), // first three positions are for bigger meteor
@@ -166,13 +174,16 @@ void MainController::draw_moon() const{
     m_moon_event_handler->update_moon(platform->dt());
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
-    shader->set_float("spotLight.cutOff", m_spot_light.cut_off);
-    shader->set_float("spotLight.outerCutOff", m_spot_light.outer_cut_off);
-    shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
-    shader->set_vec3("spotLight.specular", m_spot_light.specular);
-    shader->set_float("spotLight.linearC", m_spot_light.linear);
-    shader->set_float("spotLight.quadraticC", m_spot_light.quadratic);
-    shader->set_float("spotLight.shininess", m_spot_light.shininess);
+    shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
+    shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
+    shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
+    shader->set_vec3("spotLight.specular", m_spotlight.specular);
+    shader->set_float("spotLight.linearC", m_spotlight.linear);
+    shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
+    shader->set_float("spotLight.shininess", m_spotlight.shininess);
+    if(m_moon_event_handler->get_moon_state() == OFF)
+        shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
+
 
     shader->set_vec3("light_intensity", point_light.intensity);
     shader->set_vec3("cameraPos", graphics->camera()->Position);
@@ -203,13 +214,16 @@ void MainController::draw_space_station() const{
     shader->set_float("pointLight.shininess", point_light.shininess);
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
-    shader->set_float("spotLight.cutOff", m_spot_light.cut_off);
-    shader->set_float("spotLight.outerCutOff", m_spot_light.outer_cut_off);
-    shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
-    shader->set_vec3("spotLight.specular", m_spot_light.specular);
-    shader->set_float("spotLight.linearC", m_spot_light.linear);
-    shader->set_float("spotLight.quadraticC", m_spot_light.quadratic);
-    shader->set_float("spotLight.shininess", m_spot_light.shininess);
+    shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
+    shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
+    shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
+    shader->set_vec3("spotLight.specular", m_spotlight.specular);
+    shader->set_float("spotLight.linearC", m_spotlight.linear);
+    shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
+    shader->set_float("spotLight.shininess", m_spotlight.shininess);
+    if(m_moon_event_handler->get_moon_state() == OFF)
+        shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
+
 
 
     shader->set_vec3("cameraPos", graphics->camera()->Position);
@@ -248,13 +262,16 @@ void MainController::draw_spacecraft() const{
     shader->set_float("pointLight.shininess", point_light.shininess);
 
     shader->set_vec3("spotLight.direction", graphics->camera()->Front);
-    shader->set_float("spotLight.cutOff", m_spot_light.cut_off);
-    shader->set_float("spotLight.outerCutOff", m_spot_light.outer_cut_off);
-    shader->set_vec3("spotLight.diffuse", m_spot_light.diffuse);
-    shader->set_vec3("spotLight.specular", m_spot_light.specular);
-    shader->set_float("spotLight.linearC", m_spot_light.linear);
-    shader->set_float("spotLight.quadraticC", m_spot_light.quadratic);
-    shader->set_float("spotLight.shininess", m_spot_light.shininess);
+    shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
+    shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
+    shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
+    shader->set_vec3("spotLight.specular", m_spotlight.specular);
+    shader->set_float("spotLight.linearC", m_spotlight.linear);
+    shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
+    shader->set_float("spotLight.shininess", m_spotlight.shininess);
+    if(m_moon_event_handler->get_moon_state() == OFF)
+        shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
+
 
     shader->set_vec3("cameraPos", graphics->camera()->Position);
     shader->set_float("border", 1.1f);
@@ -303,17 +320,17 @@ void MainController::draw_gui() {
         ImGui::SliderFloat3("Point specular slider", glm::value_ptr(point_light.specular), 0.1f, 1.f);
 
         ImGui::Text("Spot light sliders:");
-        ImGui::Text("Spot light diffuse intensity: (%f, %f, %f)", m_spot_light.diffuse.x, m_spot_light.diffuse.y, m_spot_light.diffuse.z);
-        ImGui::SliderFloat3("Spot light diffuse slider", glm::value_ptr(m_spot_light.diffuse), 0.1f, 1.f);
+        ImGui::Text("Spot light diffuse intensity: (%f, %f, %f)", m_spotlight.diffuse.x, m_spotlight.diffuse.y, m_spotlight.diffuse.z);
+        ImGui::SliderFloat3("Spot light diffuse slider", glm::value_ptr(m_spotlight.diffuse), 0.1f, 1.f);
 
-        ImGui::Text("Spot light diffuse intensity: (%f, %f, %f)", m_spot_light.specular.x, m_spot_light.specular.y, m_spot_light.specular.z);
-        ImGui::SliderFloat3("Spot light specular slider", glm::value_ptr(m_spot_light.specular), 0.1f, 1.f);
+        ImGui::Text("Spot light diffuse intensity: (%f, %f, %f)", m_spotlight.specular.x, m_spotlight.specular.y, m_spotlight.specular.z);
+        ImGui::SliderFloat3("Spot light specular slider", glm::value_ptr(m_spotlight.specular), 0.1f, 1.f);
 
-        ImGui::Text("Cut off angle: (%f)", m_spot_light.cut_off);
-        ImGui::SliderFloat("Cut off slider", &m_spot_light.cut_off, -1.0f, 1.f);
+        ImGui::Text("Cut off angle: (%f)", m_spotlight.cut_off);
+        ImGui::SliderFloat("Cut off slider", &m_spotlight.cut_off, -1.0f, 1.f);
 
-        ImGui::Text("Outer cut off angle: (%f)", m_spot_light.outer_cut_off);
-        ImGui::SliderFloat("Outer cut off slider", &m_spot_light.outer_cut_off, -1.0f, 1.f);
+        ImGui::Text("Outer cut off angle: (%f)", m_spotlight.outer_cut_off);
+        ImGui::SliderFloat("Outer cut off slider", &m_spotlight.outer_cut_off, -1.0f, 1.f);
         ImGui::End();
     }
     graphics->end_gui();

@@ -22,7 +22,6 @@ uniform sampler2D bloomTexture;
 uniform sampler2D stencilTexture;
 uniform vec3 greyscale;
 uniform int bloomSwitch;
-uniform float exposure;
 
 const float offset = 1.0 / 300.0;
 

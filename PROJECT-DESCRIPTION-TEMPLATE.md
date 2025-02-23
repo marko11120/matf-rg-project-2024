@@ -5,7 +5,7 @@ Space station with spacecraft and little synthetic moon as its light source
 
 ## Controls
 
-ESC -> application terminate  
+ESC -> Application terminate  
 E -> Moon on/off switch   
 W -> Camera forward
 S -> Camera backward
@@ -17,11 +17,12 @@ LEFT -> Spacecraft rotate left
 RIGHT -> Spacecraft rotate right
 F12 -> GUI enable
 B -> Bloom on/off switch
+Q -> Lamp on/off switch(works only when moon is turned off)
 
 
 [x] Model with lighting
 [x] Two types of lighting with customizable colors and movement through GUI or ACTIONS
-[x] Moon on/off --- When moon is on/off --Triggers---> Moon position change ---> After moon position is changed ---Triggers---> Space station night light on and scene greyscale
+[x] Moon on/off --- When moon is on/off --Triggers---> Spotlight on & Moon position change & Scene grey scaling ---> After moon position is changed ---Triggers---> Space station night light on
 
 ### Group A:
 

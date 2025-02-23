@@ -45,6 +45,7 @@ uniform vec3 light_intensity;
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_specular0;
 uniform SpotLight spotLight;
+uniform int spotLightSwitch;
 
 vec3 spotLightCalc(SpotLight spotLight, vec3 FragPos, vec3 Normal, vec3 cameraPos, sampler2D texture_diffuse0, sampler2D texture_specular0){
 
@@ -83,7 +84,7 @@ void main(){
 
     vec3 result = light_intensity * texture(texture_diffuse0, TexCoords).rgb;
     float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
-    result += spotLightCalc(spotLight, FragPos, Normal, cameraPos, texture_diffuse0, texture_specular0);
+    result += spotLightSwitch * spotLightCalc(spotLight, FragPos, Normal, cameraPos, texture_diffuse0, texture_specular0);
 
     if(brightness > 0.9f)
         BrightColor = vec4(result, 1.0);
