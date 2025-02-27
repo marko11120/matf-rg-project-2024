@@ -349,8 +349,10 @@ namespace engine::graphics {
         // copy to texture from stencil buff
         auto stencil_data = new GLubyte[width * height];
 
+        CHECKED_GL_CALL(glReadPixels, 0, 0, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_data);
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
         CHECKED_GL_CALL(glTexSubImage2D, GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, (const void*)stencil_data);
+        delete[] stencil_data;
 
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
