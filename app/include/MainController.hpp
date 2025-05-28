@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 namespace engine::graphics {
+    class GBuffer;
     class Framebuffer;
     class Bloom;
 }
@@ -37,8 +38,6 @@ struct SpotLight {
 };
 
 class MainController : public engine::core::Controller {
-public:
-    PointLight point_light;
 private:
     friend class MainPlatformEventObserver;
 
@@ -112,12 +111,20 @@ private:
      */
     void terminate() override;
 
+    /**
+     * @brief sets and render geometry pass data into g-buffer
+     */
+    void geometry_pass_deferred_shading() const;
+
     bool m_spotlight_switch = 1;
     MoonEvent* m_moon_event_handler;
     glm::vec3 m_spacecraft_pos = glm::vec3(0.0f, -2.0f, -30.0f);
     float m_spacecraft_rotation = glm::radians(0.f);
     SpotLight m_spotlight;
-    engine::graphics::Framebuffer * m_framebuffer;
+    engine::graphics::Framebuffer *m_framebuffer;
+    engine::graphics::GBuffer *m_g_buffer;
+public:
+    PointLight point_light;
 };
 
 

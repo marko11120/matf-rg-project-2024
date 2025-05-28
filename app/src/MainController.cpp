@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include "MoonEvent.hpp"
 #include "engine/graphics/Bloom.hpp"
+#include "engine/graphics/G_Buffer.hpp"
 
 class MainPlatformEventObserver : public engine::platform::PlatformEventObserver {
     void on_mouse_move(engine::platform::MousePosition position) override;
@@ -20,8 +21,8 @@ void MainPlatformEventObserver::on_mouse_move(engine::platform::MousePosition po
         m_first_flick = false;
         return;
     }
-    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto graphics = engine::core::Controller::get<engine::graphics::GraphicsController>();
+    auto platform = engine::core::Controller::get<engine::platform::PlatformController>();
     auto camera = graphics->camera();
     if (platform->get_cursor_status())
         return;
@@ -54,26 +55,27 @@ void MainPlatformEventObserver::on_key(engine::platform::Key key) {
         if(main_controller->m_moon_event_handler->get_moon_state() == OFF)
             main_controller->m_spotlight_switch = !main_controller->m_spotlight_switch;
     }
-
 }
 
 void MainController::initialize() {
-    engine::graphics::OpenGL::enable_depth_testing();
     auto observer = std::make_unique<MainPlatformEventObserver>();
     get<engine::platform::PlatformController>()->register_platform_event_observer(std::move(observer));
     auto platform = get<engine::platform::PlatformController>();
     platform->set_cursor_visible(false);
 
-    m_framebuffer = new engine::graphics::Framebuffer(platform->window()->width(), platform->window()->height());
-    m_moon_event_handler = new MoonEvent();
-    engine::graphics::Bloom::bloom = true;
 
-    m_framebuffer->bind();
     auto scr_height = platform->window()->height();
-    auto scr_width = platform->window()->width();
+    auto scr_width  = platform->window()->width();
+    m_framebuffer = new engine::graphics::Framebuffer(scr_width, scr_height, false);
+    m_framebuffer->bind();
     m_framebuffer->color_buffers.push_back(engine::graphics::Bloom::create_hdr_color_buffer(scr_width, scr_height, 0));
     m_framebuffer->color_buffers.push_back(engine::graphics::Bloom::create_hdr_color_buffer(scr_width, scr_height, 1));
-    engine::graphics::Bloom::mrt(m_framebuffer->color_buffers.size());
+    m_framebuffer->unbind();
+
+    m_g_buffer = new engine::graphics::GBuffer(platform->window()->width(), platform->window()->height());
+
+    m_moon_event_handler = new MoonEvent();
+    engine::graphics::Bloom::bloom = true;
 }
 
 bool MainController::loop() {
@@ -98,35 +100,12 @@ void MainController::draw_skybox() {
 
 void MainController::draw_meteors() const{
     auto resources = get<engine::resources::ResourcesController>();
-    auto shader = resources->shader("meteor");
+    auto shader = resources->shader("geometry_pass");
     auto graphics = get<engine::graphics::GraphicsController>();
 
     shader->use();
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
-    shader->set_vec3("cameraPos", graphics->camera()->Position);
-
-    shader->set_vec3("pointLight.ambient", point_light.ambient);
-    shader->set_vec3("pointLight.diffuse", point_light.diffuse);
-    shader->set_vec3("pointLight.specular", point_light.specular);
-    shader->set_vec3("pointLight.position", point_light.position);
-    shader->set_vec3("pointLight.intensity", point_light.intensity);
-    shader->set_float("pointLight.linearC", point_light.linear);
-    shader->set_float("pointLight.quadraticC", point_light.quadratic);
-    shader->set_float("pointLight.shininess", point_light.shininess);
-
-    shader->set_vec3("spotLight.direction", graphics->camera()->Front);
-    shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
-    shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
-    shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
-    shader->set_vec3("spotLight.specular", m_spotlight.specular);
-    shader->set_float("spotLight.linearC", m_spotlight.linear);
-    shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
-    shader->set_float("spotLight.shininess", m_spotlight.shininess);
-    if(m_moon_event_handler->get_moon_state() == OFF)
-        shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
-
-
 
     static glm::vec3 positions [] = {
         glm::vec3(-29.0f,  -17.0f, -28.0f), // first three positions are for bigger meteor
@@ -139,7 +118,7 @@ void MainController::draw_meteors() const{
 
     glm::mat4 model_matrix;
     auto model1 = resources->model("meteor1"); // smaller one
-    auto model2 = resources->model("meteor2"); // biger one
+    auto model2 = resources->model("meteor2"); // bigger one
 
     auto platform = get<engine::platform::PlatformController>();
     for(int i = 0; i < 3; i++) {
@@ -158,7 +137,6 @@ void MainController::draw_meteors() const{
         model1->draw(shader);
     }
 }
-
 
 void MainController::draw_moon() const{
     auto resources = get<engine::resources::ResourcesController>();
@@ -187,6 +165,7 @@ void MainController::draw_moon() const{
 
     shader->set_vec3("light_intensity", point_light.intensity);
     shader->set_vec3("cameraPos", graphics->camera()->Position);
+    shader->set_float("border", 0.9f);
 
     auto model_matrix = glm::mat4(1.0f);
     model_matrix = translate(model_matrix, point_light.position);
@@ -201,39 +180,9 @@ void MainController::draw_moon() const{
 void MainController::draw_space_station() const{
     auto resources = get<engine::resources::ResourcesController>();
     auto graphics = get<engine::graphics::GraphicsController>();
-    auto shader = resources->shader("space_objects");
+    auto shader = resources->shader("geometry_pass");
 
     shader->use();
-    shader->set_vec3("pointLight.ambient", point_light.ambient);
-    shader->set_vec3("pointLight.diffuse", point_light.diffuse);
-    shader->set_vec3("pointLight.specular", point_light.specular);
-    shader->set_vec3("pointLight.position", point_light.position);
-    shader->set_vec3("pointLight.intensity", point_light.intensity);
-    shader->set_float("pointLight.linearC", point_light.linear);
-    shader->set_float("pointLight.quadraticC", point_light.quadratic);
-    shader->set_float("pointLight.shininess", point_light.shininess);
-
-    shader->set_vec3("spotLight.direction", graphics->camera()->Front);
-    shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
-    shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
-    shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
-    shader->set_vec3("spotLight.specular", m_spotlight.specular);
-    shader->set_float("spotLight.linearC", m_spotlight.linear);
-    shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
-    shader->set_float("spotLight.shininess", m_spotlight.shininess);
-    if(m_moon_event_handler->get_moon_state() == OFF)
-        shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
-
-
-
-    shader->set_vec3("cameraPos", graphics->camera()->Position);
-    shader->set_float("border", 1.f);
-
-    if(m_moon_event_handler->get_moon_state() == OFF && point_light.position.y <= -15.f) {
-        shader->set_vec3("pointLight.intensity", glm::vec3(1.f));
-        shader->set_vec3("pointLight.diffuse", glm::vec3(0.f));
-        shader->set_vec3("pointLight.specular", glm::vec3(0.f));
-    }
 
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
@@ -249,38 +198,10 @@ void MainController::draw_space_station() const{
 void MainController::draw_spacecraft() const{
     auto resources = get<engine::resources::ResourcesController>();
     auto graphics = get<engine::graphics::GraphicsController>();
-    auto shader = resources->shader("space_objects");
+    auto shader = resources->shader("geometry_pass");
 
     shader->use();
-    shader->set_vec3("pointLight.ambient", point_light.ambient);
-    shader->set_vec3("pointLight.diffuse", point_light.diffuse);
-    shader->set_vec3("pointLight.specular", point_light.specular);
-    shader->set_vec3("pointLight.position", point_light.position);
-    shader->set_vec3("pointLight.intensity", point_light.intensity);
-    shader->set_float("pointLight.linearC", point_light.linear);
-    shader->set_float("pointLight.quadraticC", point_light.quadratic);
-    shader->set_float("pointLight.shininess", point_light.shininess);
 
-    shader->set_vec3("spotLight.direction", graphics->camera()->Front);
-    shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
-    shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
-    shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
-    shader->set_vec3("spotLight.specular", m_spotlight.specular);
-    shader->set_float("spotLight.linearC", m_spotlight.linear);
-    shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
-    shader->set_float("spotLight.shininess", m_spotlight.shininess);
-    if(m_moon_event_handler->get_moon_state() == OFF)
-        shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
-
-
-    shader->set_vec3("cameraPos", graphics->camera()->Position);
-    shader->set_float("border", 1.1f);
-
-    if(m_moon_event_handler->get_moon_state() == OFF && point_light.position.y <= -15.f) {
-        shader->set_vec3("pointLight.intensity", glm::vec3(0.6f));
-        shader->set_vec3("pointLight.diffuse", glm::vec3(0.f));
-        shader->set_vec3("pointLight.specular", glm::vec3(0.f));
-    }
     shader->set_mat4("projection", graphics->projection_matrix());
     shader->set_mat4("view", graphics->camera()->view_matrix());
     auto model_matrix = glm::mat4(1.0f);
@@ -336,39 +257,104 @@ void MainController::draw_gui() {
     graphics->end_gui();
 }
 
-void MainController::draw() {
-    m_framebuffer->bind();
-    engine::graphics::OpenGL::enable_depth_testing();
-    engine::graphics::OpenGL::clear_buffers();
-
+void MainController::geometry_pass_deferred_shading() const{
     draw_meteors();
-    draw_moon();
     draw_space_station();
     draw_spacecraft();
+}
+
+void MainController::draw() {
+    engine::graphics::OpenGL::enable_depth_testing();
+
+    // geometry pass
+    m_g_buffer->bind();
+    engine::graphics::OpenGL::clear_buffers();
+    engine::graphics::OpenGL::draw_mrt(3);
+    geometry_pass_deferred_shading();
+    m_g_buffer->unbind();
+
+    // lighting pass
+    m_framebuffer->bind();
+    engine::graphics::OpenGL::clear_buffers();
+    engine::graphics::OpenGL::draw_mrt(m_framebuffer->color_buffers.size());
+    auto resources            = get<engine::resources::ResourcesController>();
+    auto lighting_pass_shader = resources->shader("lighting_pass");
+    lighting_pass_shader->use();
+    lighting_pass_shader->set_int("gPosition", 0);
+    lighting_pass_shader->set_int("gNormal", 1);
+    lighting_pass_shader->set_int("gAlbedoSpec", 2);
+
+    engine::graphics::OpenGL::activate_texture(m_g_buffer->get_position_texture(), 0);
+    engine::graphics::OpenGL::activate_texture(m_g_buffer->get_normal_texture(), 1);
+    engine::graphics::OpenGL::activate_texture(m_g_buffer->get_albedo_spec_texture(), 2);
+
+    // set up lights
+    lighting_pass_shader->set_vec3("pointLight.ambient", point_light.ambient);
+    lighting_pass_shader->set_vec3("pointLight.diffuse", point_light.diffuse);
+    lighting_pass_shader->set_vec3("pointLight.specular", point_light.specular);
+    lighting_pass_shader->set_vec3("pointLight.position", point_light.position);
+    lighting_pass_shader->set_vec3("pointLight.intensity", point_light.intensity);
+    lighting_pass_shader->set_float("pointLight.linearC", point_light.linear);
+    lighting_pass_shader->set_float("pointLight.quadraticC", point_light.quadratic);
+    lighting_pass_shader->set_float("pointLight.shininess", point_light.shininess);
+    auto graphics = get<engine::graphics::GraphicsController>();
+    lighting_pass_shader->set_vec3("spotLight.direction", graphics->camera()->Front);
+    lighting_pass_shader->set_float("spotLight.cutOff", m_spotlight.cut_off);
+    lighting_pass_shader->set_float("spotLight.outerCutOff", m_spotlight.outer_cut_off);
+    lighting_pass_shader->set_vec3("spotLight.diffuse", m_spotlight.diffuse);
+    lighting_pass_shader->set_vec3("spotLight.specular", m_spotlight.specular);
+    lighting_pass_shader->set_float("spotLight.linearC", m_spotlight.linear);
+    lighting_pass_shader->set_float("spotLight.quadraticC", m_spotlight.quadratic);
+    lighting_pass_shader->set_float("spotLight.shininess", m_spotlight.shininess);
+    if (m_moon_event_handler->get_moon_state() == OFF)
+        lighting_pass_shader->set_int("spotLightSwitch", (m_spotlight_switch ? 1 : 0));
+    lighting_pass_shader->set_vec3("cameraPos", graphics->camera()->Position);
+    lighting_pass_shader->set_float("border", 1.1f);
+
+    engine::graphics::OpenGL::disable_depth_testing();
+    engine::graphics::OpenGL::render_quad(m_g_buffer->quad_vao);
+
+    engine::graphics::OpenGL::bind_framebuffer_reading(m_g_buffer->get_framebuffer_id());
+    engine::graphics::OpenGL::bind_framebuffer_drawing(0);
+
+    auto platform   = get<engine::platform::PlatformController>();
+    auto scr_height = platform->window()->height();
+    auto scr_width  = platform->window()->width();
+    engine::graphics::OpenGL::blit_to_default_framebuffer(scr_width, scr_height);
+
+    m_framebuffer->bind();
+    engine::graphics::OpenGL::enable_depth_testing();
+
+    engine::graphics::OpenGL::prepare_for_background_draw(m_g_buffer->get_framebuffer_id(), m_framebuffer->get_framebuffer_id(), scr_width, scr_height);
     draw_skybox();
-    auto platform = get<engine::platform::PlatformController>();
+    engine::graphics::OpenGL::finalize_background_draw();
+
+    draw_moon();
+
+    m_framebuffer->unbind();
+
+    // finally rendering to the screen
+    engine::graphics::OpenGL::disable_depth_testing();
+    engine::graphics::OpenGL::clear_buffers();
+    engine::graphics::Bloom::activate_bloom_textures(m_framebuffer->color_buffers);
+    auto postprocessing_shader = resources->shader("postprocessing");
+
+    postprocessing_shader->use();
+    postprocessing_shader->set_int("bloomSwitch", (engine::graphics::Bloom::bloom ? 1 : 0));
+    postprocessing_shader->set_int("screenTexture", 0);
+    postprocessing_shader->set_int("bloomTexture", 1);
+
+    if (m_moon_event_handler->get_moon_state() == OFF)
+        postprocessing_shader->set_vec3("greyscale", glm::vec3(0.299f, 0.587f, 0.114f));
+    else if (m_moon_event_handler->get_moon_state() == ON)
+        postprocessing_shader->set_vec3("greyscale", glm::vec3(1.f));
+
+    m_framebuffer->draw_fullscreen_quad();
+
+
     if (platform->get_cursor_status()) {
         draw_gui();
     }
-
-    m_framebuffer->unbind();
-    engine::graphics::Bloom::activate_bloom_textures(m_framebuffer->color_buffers);
-
-    auto resources = get<engine::resources::ResourcesController>();
-    auto shader = resources->shader("postprocessing");
-
-    shader->use();
-    shader->set_int("bloomSwitch", (engine::graphics::Bloom::bloom ? 1 : 0));
-    shader->set_int("screenTexture", 0);
-    shader->set_int("bloomTexture", 1);
-
-    if(m_moon_event_handler->get_moon_state() == OFF)
-        shader->set_vec3("greyscale", glm::vec3(0.299f, 0.587f, 0.114f));
-    else if(m_moon_event_handler->get_moon_state() == ON)
-        shader->set_vec3("greyscale", glm::vec3(1.f));
-
-
-    m_framebuffer->draw_fullscreen_quad();
 }
 
 void MainController::end_draw() {

@@ -6,13 +6,18 @@
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
 
+#include "../libs/assimp/code/AssetLib/MDC/MDCFileData.h"
+
 namespace engine::graphics {
-    Framebuffer::Framebuffer(int width, int height) {
-        m_vao = OpenGL::configure_framebuffer_rectangle();
+
+    Framebuffer::Framebuffer(int width, int height, bool g_buffer) {
         m_framebuffer = OpenGL::create_framebuffer();
-        m_texture_color_buffer = OpenGL::create_color_attachment(width, height);
-        m_rbo = OpenGL::create_render_buffer(width, height);
-        m_stencil_texture = OpenGL::create_texture(width, height);
+        if(!g_buffer) {
+            m_vao = OpenGL::configure_framebuffer_rectangle();
+            m_texture_color_buffer = OpenGL::create_color_attachment(width, height);
+            m_rbo = OpenGL::create_render_buffer(width, height);
+            m_stencil_texture = OpenGL::create_texture(width, height);
+        }
     }
 
     void Framebuffer::bind() const{
@@ -57,4 +62,5 @@ namespace engine::graphics {
     void Framebuffer::activate_stencil_texture(int slot) const{
         OpenGL::activate_texture(m_stencil_texture, slot);
     }
+
 } // namespace engine::graphics

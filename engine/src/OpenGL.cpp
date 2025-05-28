@@ -255,10 +255,14 @@ namespace engine::graphics {
 
 
     unsigned int OpenGL::configure_framebuffer_rectangle() {
-        float vertices[] = {// positions   // texCoords
-            -1.0f, 1.0f, 0.0f, 1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, -1.0f, 1.0f, 0.0f,
-
-            -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  -1.0f, 1.0f, 0.0f, 1.0f, 1.0f,  1.0f, 1.0f
+        float vertices[] = {
+            // positions       // texCoords
+            -1.0f, 1.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f,
+             1.0f, -1.0f, 1.0f, 0.0f,
+            -1.0f, 1.0f, 0.0f, 1.0f,
+             1.0f, -1.0f, 1.0f, 0.0f,
+             1.0f, 1.0f,  1.0f, 1.0f
         };
 
         unsigned int vbo;
@@ -393,8 +397,109 @@ namespace engine::graphics {
         for(int i = 0; i < number_of_attachments; i++) {
             attachments[i] = GL_COLOR_ATTACHMENT0 + i;
         }
-        CHECKED_GL_CALL(glDrawBuffers, 2, attachments);
+        CHECKED_GL_CALL(glDrawBuffers, number_of_attachments, attachments);
     }
 
+    unsigned int OpenGL::create_color_buffer(int scr_width, int scr_height, bool floating_point, int buffer_number) {
+        unsigned int id;
+        CHECKED_GL_CALL(glGenTextures, 1, &id);
+        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, id);
+        if(floating_point)
+            CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA16F, scr_width, scr_height, 0, GL_RGBA, GL_FLOAT, nullptr);
+        else
+            CHECKED_GL_CALL(glTexImage2D, GL_TEXTURE_2D, 0, GL_RGBA, scr_width, scr_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        CHECKED_GL_CALL(glFramebufferTexture2D, GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + buffer_number, GL_TEXTURE_2D, id, 0);
+
+        return id;
+    }
+
+    unsigned int OpenGL::create_1x1_quad() {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        unsigned int quad_vao;
+        unsigned int quad_vbo;
+        // setup plane VAO
+        CHECKED_GL_CALL(glGenVertexArrays, 1, &quad_vao);
+        CHECKED_GL_CALL(glGenBuffers, 1, &quad_vbo);
+        CHECKED_GL_CALL(glBindVertexArray, quad_vao);
+        CHECKED_GL_CALL(glBindBuffer, GL_ARRAY_BUFFER, quad_vbo);
+        CHECKED_GL_CALL(glBufferData, GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        CHECKED_GL_CALL(glEnableVertexAttribArray, 0);
+        CHECKED_GL_CALL(glVertexAttribPointer, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+        CHECKED_GL_CALL(glEnableVertexAttribArray, 1);
+        CHECKED_GL_CALL(glVertexAttribPointer, 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+        return quad_vao;
+    }
+
+    void OpenGL::render_quad(unsigned int quad_vao) {
+        CHECKED_GL_CALL(glBindVertexArray, quad_vao);
+        CHECKED_GL_CALL(glDrawArrays, GL_TRIANGLE_STRIP, 0, 4);
+        CHECKED_GL_CALL(glBindVertexArray, 0);
+    }
+
+    unsigned int OpenGL::create_and_attach_depth_buffer(int scr_width, int scr_height) {
+        unsigned int rbo_depth;
+        CHECKED_GL_CALL(glGenRenderbuffers, 1, &rbo_depth);
+        CHECKED_GL_CALL(glBindRenderbuffer, GL_RENDERBUFFER, rbo_depth);
+        CHECKED_GL_CALL(glRenderbufferStorage, GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, scr_width, scr_height);
+        CHECKED_GL_CALL(glFramebufferRenderbuffer, GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo_depth);
+
+        return rbo_depth;
+    }
+
+    void OpenGL::depth_func(std::string func) {
+        if(func == "LEQUAL")
+            CHECKED_GL_CALL(glDepthFunc, GL_LEQUAL);
+        else if(func == "LESS" )
+            CHECKED_GL_CALL(glDepthFunc, GL_LESS);
+    }
+
+
+
+    void OpenGL::bind_framebuffer_reading(unsigned int framebuffer) {
+        CHECKED_GL_CALL(glBindFramebuffer, GL_READ_FRAMEBUFFER, framebuffer);
+    }
+
+    void OpenGL::bind_framebuffer_drawing(unsigned int framebuffer) {
+        CHECKED_GL_CALL(glBindFramebuffer, GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
+    }
+
+
+    void OpenGL::blit_to_default_framebuffer(int SCR_WIDTH, int SCR_HEIGHT) {
+        CHECKED_GL_CALL(glBlitFramebuffer, 0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+        CHECKED_GL_CALL(glBindFramebuffer, GL_FRAMEBUFFER, 0);
+    }
+
+
+    void OpenGL::prepare_for_background_draw(unsigned int g_buffer_id, unsigned int framebuffer_id, int width, int height) {
+        CHECKED_GL_CALL(glBindFramebuffer, GL_READ_FRAMEBUFFER, g_buffer_id);
+        CHECKED_GL_CALL(glBindFramebuffer, GL_DRAW_FRAMEBUFFER, framebuffer_id);
+        CHECKED_GL_CALL(glBlitFramebuffer,
+          0, 0, width, height,
+          0, 0, width, height,
+          GL_DEPTH_BUFFER_BIT, GL_NEAREST
+        );
+
+        // set up depth test so skybox only draws where nothing is close
+        CHECKED_GL_CALL(glEnable, GL_DEPTH_TEST);
+        CHECKED_GL_CALL(glDepthFunc, GL_LEQUAL);
+
+        // prvent skybox from writing into depth buffer:
+        CHECKED_GL_CALL(glDepthMask, GL_FALSE);
+
+    }
+
+    void OpenGL::finalize_background_draw() {
+        CHECKED_GL_CALL(glDepthMask, GL_TRUE);
+        CHECKED_GL_CALL(glDepthFunc, GL_LESS);
+    }
 }
 

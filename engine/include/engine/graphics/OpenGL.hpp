@@ -149,7 +149,7 @@ namespace engine::graphics {
 
         /**
         * @brief creates color attachment and returns its id
-        * @param scr_width widht of created color attachment
+        * @param scr_width width of created color attachment
         * @param scr_height height of created color attachment
         * @returns color attachment id
         */
@@ -271,6 +271,71 @@ namespace engine::graphics {
         * @returns shader compilation error message.
         */
         static std::string get_compilation_error_message(uint32_t shader_id);
+
+        /**
+         * @brief create color buffer primary configured for deferred shading use
+         * @param scr_width width of the buffer
+         * @param scr_height height of the buffer
+         * @param floating_point whether to set the format of the buffer to use floating point or default OpenGL clamp
+         * [0, 1]
+         * @param buffer_number the sequence number of the attachment
+         * @returns returns buffer id
+         */
+        static unsigned int create_color_buffer(int scr_width, int scr_height, bool floating_point, int buffer_number);
+
+        /**
+         * @brief creates 1x1 quad necessary for deferred shading
+         * @returns returns vao(vertex array object) id
+         */
+        static unsigned int create_1x1_quad();
+
+        /**
+         * @brief renders a 1x1 quad using triangle strip
+         */
+        static void render_quad(unsigned int quad_vao);
+
+        /**
+        * @brief renders a 1x1 quad using triangle strip
+        * @param scr_width width of the buffer
+        * @param scr_height height of the buffer
+        * @returns buffer id
+        */
+        static unsigned int create_and_attach_depth_buffer(int scr_width, int scr_height);
+
+        static void depth_func(std::string func);
+
+        /**
+        * @brief bind framebuffer for reading
+        * @param framebuffer id of framebuffer
+        */
+        static void bind_framebuffer_reading(unsigned int framebuffer);
+
+        /**
+        * @brief bind framebuffer for drawing
+        * @param framebuffer id of framebuffer
+        */
+        static void bind_framebuffer_drawing(unsigned int framebuffer);
+
+        /**
+        * @brief copy the depth buffer from the currently bound framebuffer to the default framebuffer, then bind the default framebuffer for rendering
+        * @param scr_width width of the buffer
+        * @param scr_height height of the buffer
+        */
+        static void blit_to_default_framebuffer(int SCR_WIDTH, int SCR_HEIGHT);
+
+        /**
+        * @brief copies geometry data so skybox is drawn behind other objects on the scene
+        * @param g_buffer_id depth buffer source copy
+        * @param framebuffer_id depth buffer dest copy
+        * @param width width of the buffer
+        * @param height height of the buffer
+        */
+        static void prepare_for_background_draw(unsigned int g_buffer_id, unsigned int framebuffer_id, int width, int height);
+
+        /**
+        * @brief restore framebuffer config set in the prepare_for_background_draw function, like clean up function
+        */
+        static void finalize_background_draw();
 
     private:
         /**
