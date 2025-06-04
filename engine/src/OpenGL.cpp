@@ -281,86 +281,6 @@ namespace engine::graphics {
         return vao;
     }
 
-    // stencil to texture functions
-    void OpenGL::enable_stencil_testing() {
-        CHECKED_GL_CALL(glEnable, GL_STENCIL_TEST);
-    }
-    void OpenGL::disable_stencil_writing() {
-        CHECKED_GL_CALL(glStencilMask, 0x00);
-    }
-    void OpenGL::stencil_func(Flags func, int ref, unsigned int mask) {
-        GLenum func_;
-
-        switch (func) {
-            case NEVER: func_ = GL_NEVER; break;
-            case LESS: func_ = GL_LESS; break;
-            case EQUAL: func_ = GL_EQUAL; break;
-            case NOTEQUAL: func_ = GL_NOTEQUAL; break;
-            case GREATER: func_ = GL_GREATER; break;
-            case ALWAYS: func_ = GL_ALWAYS; break;
-        default: func_ = GL_NEVER; break;
-        }
-
-        CHECKED_GL_CALL(glStencilFunc, func_, ref, mask);
-    }
-    void OpenGL::stencil_op(Flags sfail, Flags dfail, Flags dpass) {
-        GLenum sfail_;
-
-        switch (sfail) {
-            case KEEP: sfail_ = GL_KEEP; break;
-            case ZERO: sfail_ = GL_ZERO; break;
-            case REPLACE: sfail_ = GL_REPLACE; break;
-            case INCR: sfail_ = GL_INCR; break;
-            case DECR: sfail_ = GL_DECR; break;
-            case INVERT: sfail_ = GL_INVERT; break;
-        default: sfail_ = GL_KEEP; break;
-        }
-
-        GLenum dfail_;
-
-        switch (dfail) {
-            case KEEP: dfail_ = GL_KEEP; break;
-            case ZERO: dfail_ = GL_ZERO; break;
-            case REPLACE: dfail_ = GL_REPLACE; break;
-            case INCR: dfail_ = GL_INCR; break;
-            case DECR: dfail_ = GL_DECR; break;
-            case INVERT: dfail_ = GL_INVERT; break;
-            default: dfail_ = GL_KEEP; break;
-        }
-        GLenum dpass_;
-
-        switch (dpass) {
-            case KEEP: dpass_ = GL_KEEP; break;
-            case ZERO: dpass_ = GL_ZERO; break;
-            case REPLACE: dpass_ = GL_REPLACE; break;
-            case INCR: dpass_ = GL_INCR; break;
-            case DECR: dpass_ = GL_DECR; break;
-            case INVERT: dpass_ = GL_INVERT; break;
-        default: dpass_ = GL_KEEP; break;
-        }
-
-        CHECKED_GL_CALL(glStencilOp, sfail_, dfail_, dpass_);
-    }
-    void OpenGL::stencil_mask(int mask) {
-        if (mask == 0)
-            CHECKED_GL_CALL(glStencilMask, 0x00);
-        else if (mask == 1)
-            CHECKED_GL_CALL(glStencilMask, 0xFF);
-    }
-
-    void OpenGL::copy_stencil_to_texture(int width, int height, unsigned int stencil_texture) {
-
-        // copy to texture from stencil buff
-        auto stencil_data = new GLubyte[width * height];
-
-        CHECKED_GL_CALL(glReadPixels, 0, 0, width, height, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE, stencil_data);
-        CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, stencil_texture);
-        CHECKED_GL_CALL(glTexSubImage2D, GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, (const void*)stencil_data);
-        delete[] stencil_data;
-
-        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        CHECKED_GL_CALL(glTexParameteri, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    }
     void OpenGL::activate_texture(unsigned int texture, int slot) {
         CHECKED_GL_CALL(glActiveTexture, GL_TEXTURE0 + slot);
         CHECKED_GL_CALL(glBindTexture, GL_TEXTURE_2D, texture);
@@ -454,15 +374,6 @@ namespace engine::graphics {
 
         return rbo_depth;
     }
-
-    void OpenGL::depth_func(std::string func) {
-        if(func == "LEQUAL")
-            CHECKED_GL_CALL(glDepthFunc, GL_LEQUAL);
-        else if(func == "LESS" )
-            CHECKED_GL_CALL(glDepthFunc, GL_LESS);
-    }
-
-
 
     void OpenGL::bind_framebuffer_reading(unsigned int framebuffer) {
         CHECKED_GL_CALL(glBindFramebuffer, GL_READ_FRAMEBUFFER, framebuffer);

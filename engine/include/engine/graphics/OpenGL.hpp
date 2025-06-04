@@ -197,14 +197,6 @@ namespace engine::graphics {
         static void draw_arrays(int vertex_count);
 
         /**
-        * @brief copies data from stencil buffer to texture with id stencil_texture
-        * @param width width of texture
-        * @param height height of texture
-        * @param stencil_texture stencil texture id
-        */
-        static void copy_stencil_to_texture(int width, int height, unsigned int stencil_texture);
-
-        /**
         * @brief creates texture
         * @param width width of texture
         * @param height height of texture
@@ -219,37 +211,6 @@ namespace engine::graphics {
         */
         static void activate_texture(unsigned int texture, int slot);
 
-        /**
-        * @brief enables stencil testing
-        */
-        static void enable_stencil_testing();
-
-        /**
-        * @brief disable writing into stencil buffer
-        */
-        static void disable_stencil_writing();
-
-        /**
-        * @brief determines the way of writing into stencil buff
-        * @param func flag for functions which be used
-        * @param ref value that will be tested with stencil buffer value
-        * @param mask maks that ANDs ref value and stencil buff value before testing
-        */
-        static void stencil_func(Flags func, int ref, unsigned int mask);
-
-        /**
-        * @brief actions that should be executed based on testing results
-        * @param sfail action if stencil test fails
-        * @param dfail aciton if stencil test pass and depth test fails
-        * @param dpass action if both tests pass
-        */
-        static void stencil_op(Flags sfail, Flags dfail, Flags dpass);
-
-        /**
-        * @brief sets stencil mask to mask
-        * @param mask value for evaluating stencil mask
-        */
-        static void stencil_mask(int mask);
 
         /**
         * @brief creates hdr texture and attaches it to color attachment number attachment_number
@@ -302,7 +263,6 @@ namespace engine::graphics {
         */
         static unsigned int create_and_attach_depth_buffer(int scr_width, int scr_height);
 
-        static void depth_func(std::string func);
 
         /**
         * @brief bind framebuffer for reading
