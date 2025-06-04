@@ -6,8 +6,6 @@
 #include <engine/graphics/OpenGL.hpp>
 #include <engine/platform/PlatformController.hpp>
 
-#include "../libs/assimp/code/AssetLib/MDC/MDCFileData.h"
-
 namespace engine::graphics {
 
     Framebuffer::Framebuffer(int width, int height, bool g_buffer) {
@@ -17,6 +15,8 @@ namespace engine::graphics {
             m_texture_color_buffer = OpenGL::create_color_attachment(width, height);
             m_rbo = OpenGL::create_render_buffer(width, height);
             m_stencil_texture = OpenGL::create_texture(width, height);
+        }else {
+            //RG_SHOULD_NOT_REACH_HERE
         }
     }
 

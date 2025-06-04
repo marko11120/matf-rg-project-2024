@@ -2,11 +2,10 @@
 // Created by marko on 5/28/25.
 //
 
-#include "G_Buffer.hpp"
-#include "OpenGL.hpp"
+#include <engine/graphics/G_Buffer.hpp>
+#include <engine/graphics/OpenGL.hpp>
 
 namespace engine::graphics {
-
 
     GBuffer::GBuffer(int width, int height) : Framebuffer(width, height, true) {
         m_g_position       = OpenGL::create_color_buffer(width, height, true, 0);

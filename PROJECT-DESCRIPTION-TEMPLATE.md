@@ -34,7 +34,7 @@ Q -> Lamp on/off switch(works only when moon is turned off)
 ### Group B:
 
 [x] Bloom with the use of HDR
-[ ] Deferred Shading  
+[X] Deferred Shading  
 [ ] Point Shadows  
 [ ] SSAO
 
