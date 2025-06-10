@@ -34,7 +34,7 @@ Q -> Camera Flashlight on/off switch(works only when moon is turned off)
 ### Group B:
 
 [x] Bloom with the use of HDR
-[X] Deferred Shading  
+[ ] Deferred Shading  
 [ ] Point Shadows  
 [ ] SSAO
 
