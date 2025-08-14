@@ -49,7 +49,7 @@ namespace engine::graphics {
         /**
         * @brief disables depth testing and draws fullscreen quad, necessary for postprocessing, into active framebuffer
         **/
-        void draw_fullscreen_quad() const
+        void draw_fullscreen_quad() const;
 
         /**
         * @brief returns id of framebuffer
