@@ -130,6 +130,18 @@ namespace engine::platform {
 
         void _platform_on_mouse_button(int button, int action);
 
+        /**
+         * @brief changes cursors visibility
+         * @param flag is true for visible cursor, false for hidden
+         */
+        void set_cursor_visible(bool flag);
+
+        /**
+        * @brief getter for cursors status
+        * @returns true for visible cursor, false for hidden
+        */
+        bool get_cursor_status();
+
     private:
         Key &key_ref(KeyId key);
 
@@ -151,6 +163,7 @@ namespace engine::platform {
 
         void update_key(Key &key_data) const;
 
+        bool m_cursor_visible = false;
         FrameTime m_frame_time;
         Window m_window;
         std::vector<Key> m_keys;

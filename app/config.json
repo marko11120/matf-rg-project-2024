@@ -1,11 +1,31 @@
 {
   "resources": {
     "models": {
+      "Moon" : {
+        "path" : "Moon/Moon.obj",
+        "flip_uvs" : true
+      },
+      "space_station": {
+       "path" : "space_station/space_station.obj",
+        "flip_uvs" : true
+      },
+      "spacecraft2": {
+        "path" : "spacecraft2/scene.gltf",
+        "flip_uvs" : true
+      },
+      "meteor2": {
+        "path" : "meteor2/meteor.obj",
+        "flip_uvs" : true
+      },
+      "meteor1": {
+        "path" : "meteor1/meteor.obj",
+        "flip_uvs" : true
+      }
     }
   },
   "window": {
-    "height": 600,
-    "title": "Hello, window!",
-    "width": 800
+    "height": 1080,
+    "title": "Space station",
+    "width": 1920
   }
 }

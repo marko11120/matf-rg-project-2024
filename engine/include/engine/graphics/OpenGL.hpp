@@ -5,9 +5,14 @@
 
 #ifndef OPENGL_HPP
 #define OPENGL_HPP
+
+#include "Framebuffer.hpp"
+#include <engine/resources/Shader.hpp>
 #include <cstdint>
 #include <filesystem>
-#include <engine/resources/Shader.hpp>
+
+
+
 
 namespace engine::resources {
     class Skybox;
@@ -33,6 +38,8 @@ namespace engine::graphics {
     *
     * Any OpenGL additional direct OpenGL calls you need should be added here.
     */
+
+
     class OpenGL {
     public:
         using ShaderProgramId = uint32_t;
@@ -132,13 +139,163 @@ namespace engine::graphics {
         * @brief Clears GL_DEPTH_BUFFER_BIT, GL_COLOR_BUFFER_BIT, and GL_STENCIL_BUFFER_BIT.
         */
         static void clear_buffers();
+#
 
+        /**
+        * @brief creates and bind framebuffer
+        * @returns framebuffer id
+        */
+        static unsigned int create_framebuffer();
+
+        /**
+        * @brief creates color attachment and returns its id
+        * @param scr_width width of created color attachment
+        * @param scr_height height of created color attachment
+        * @returns color attachment id
+        */
+        static unsigned int create_color_attachment(int scr_width, int scr_height);
+
+        /**
+        * @brief creates render buffer and returns its id
+        * @param scr_width width of render buffer
+        * @param scr_height height of render buffer
+        * @returns render buffer id
+        */
+        static unsigned int create_render_buffer(int scr_width, int scr_height);
+
+        /**
+        * @brief sends rectangle data on GPU for drawing
+        * @returns vao id
+        */
+        static unsigned int configure_framebuffer_rectangle();
+
+        /**
+        * @brief binds frame buffer
+        * @param framebuffer id for binding the framebuffer
+        */
+        static void bind_framebuffer(unsigned int framebuffer);
+
+        /**
+        * @brief set OpenGL state color to (r, g, b, a) and clears color buffer
+        * @param r percent of red
+        * @param g percent of green
+        * @param b percent of blue
+        * @param a percent of transparency
+        */
+        static void clear_color(float r, float g, float b, float a);
+
+        /**
+        * @brief binds vertex array
+        * @param buffer_id id that should be binded
+        */
+        static void bind_buffer(unsigned int buffer_id);
+
+        /**
+        * @brief calls OpenGL glDrawArrays to draw triangles
+        * @param vertex_count number of vertexes that should be used for drawing
+        */
+        static void draw_arrays(int vertex_count);
+
+        /**
+        * @brief creates texture
+        * @param width width of texture
+        * @param height height of texture
+        * @returns returns texture id
+        */
+        static unsigned int create_texture(int width, int height);
+
+        /**
+        * @brief activate texture slot and binds texture
+        * @param texture id of texture that should be activated
+        * @param slot slot on which texture should be avaliable
+        */
+        static void activate_texture(unsigned int texture, int slot);
+
+
+        /**
+        * @brief creates hdr texture and attaches it to color attachment number attachment_number
+        * @param scr_height screen height
+        * @param scr_width screen width
+        * @param attachment_number as which number should by attached to framebuffer
+        * @returns color buffer id
+        */
+        static unsigned int create_and_attach_color_buffer(int scr_width, int scr_height, int attachment_number);
+
+        /**
+        * @brief MRT(multiple render targets) for number_of_attachments color attachments
+        * @param number_of_attachments how many attachments should be set to draw into
+        */
+        static void draw_mrt(int number_of_attachments);
         /**
         * @brief Retrieve the shader compilation error log message.
         * @param shader_id Shader id for which the compilation failed.
         * @returns shader compilation error message.
         */
         static std::string get_compilation_error_message(uint32_t shader_id);
+
+        /**
+         * @brief create color buffer primary configured for deferred shading use
+         * @param scr_width width of the buffer
+         * @param scr_height height of the buffer
+         * @param floating_point whether to set the format of the buffer to use floating point or default OpenGL clamp
+         * [0, 1]
+         * @param buffer_number the sequence number of the attachment
+         * @returns returns buffer id
+         */
+        static unsigned int create_color_buffer(int scr_width, int scr_height, bool floating_point, int buffer_number);
+
+        /**
+         * @brief creates 1x1 quad necessary for deferred shading
+         * @returns returns vao(vertex array object) id
+         */
+        static unsigned int create_1x1_quad();
+
+        /**
+         * @brief renders a 1x1 quad using triangle strip
+         */
+        static void render_quad(unsigned int quad_vao);
+
+        /**
+        * @brief renders a 1x1 quad using triangle strip
+        * @param scr_width width of the buffer
+        * @param scr_height height of the buffer
+        * @returns buffer id
+        */
+        static unsigned int create_and_attach_depth_buffer(int scr_width, int scr_height);
+
+
+        /**
+        * @brief bind framebuffer for reading
+        * @param framebuffer id of framebuffer
+        */
+        static void bind_framebuffer_reading(unsigned int framebuffer);
+
+        /**
+        * @brief bind framebuffer for drawing
+        * @param framebuffer id of framebuffer
+        */
+        static void bind_framebuffer_drawing(unsigned int framebuffer);
+
+        /**
+        * @brief copy the depth buffer from the currently bound framebuffer to the default framebuffer, then bind the default framebuffer for rendering
+        * @param scr_width width of the buffer
+        * @param scr_height height of the buffer
+        */
+        static void blit_to_default_framebuffer(int SCR_WIDTH, int SCR_HEIGHT);
+
+        /**
+        * @brief copies geometry data so skybox is drawn behind other objects on the scene
+        * @param g_buffer_id depth buffer source copy
+        * @param framebuffer_id depth buffer dest copy
+        * @param width width of the buffer
+        * @param height height of the buffer
+        */
+        static void prepare_for_background_draw(unsigned int g_buffer_id, unsigned int framebuffer_id, int width, int height);
+
+        /**
+        * @brief restore framebuffer config set in the prepare_for_background_draw function, like clean up function
+        */
+        static void finalize_background_draw();
 
     private:
         /**

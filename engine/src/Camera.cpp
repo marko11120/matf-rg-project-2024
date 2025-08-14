@@ -1,5 +1,7 @@
-
 #include <engine/graphics/Camera.hpp>
+#include <engine/platform/PlatformController.hpp>
+
+#include "GLFW/glfw3.h"
 
 namespace engine::graphics {
     // constructor with vectors
@@ -87,4 +89,5 @@ namespace engine::graphics {
         // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
         Up = glm::normalize(glm::cross(Right, Front));
     }
+
 }

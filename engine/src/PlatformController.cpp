@@ -1,7 +1,6 @@
-
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -279,6 +278,21 @@ namespace engine::platform {
 
     void glfw_window_close_callback(GLFWwindow *window) {
         core::Controller::get<PlatformController>()->_platform_on_window_close(window);
+    }
+
+    void PlatformController::set_cursor_visible(bool flag) {
+        auto glfw_window = window()->handle_();
+        m_cursor_visible = flag;
+
+        if(flag)
+            glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        else {
+            glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+    }
+
+    bool PlatformController::get_cursor_status() {
+        return m_cursor_visible;
     }
 
 } // namespace engine
